@@ -155,6 +155,7 @@ class MoreAdvancementsDataPack(Datapack):
         ))
 
     def _create_husbandry_advancements(self):
+        # FixMe: inventory_changed advancements get triggered on load
         self.add_advancement(Advancement(
             name="fish_enchanted_book",
             datapack=self.name,
@@ -254,6 +255,7 @@ class MoreAdvancementsDataPack(Datapack):
                 }
             }
         ))
+        # FixMe: inventory_changed advancements get triggered on load
         self.add_advancement(Advancement(
             name="craft_shulker_box",
             datapack=self.name,
@@ -286,6 +288,7 @@ class MoreAdvancementsDataPack(Datapack):
                 }
             }
         ))
+        # FixMe: inventory_changed advancements get triggered on load
         self.add_advancement(Advancement(
             name="find_dragon_head",
             datapack=self.name,

@@ -71,6 +71,10 @@ class Advancement:
         self.icon["item"] = item
         return self
 
+    def set_icon_nbt(self, nbt: str) -> Advancement:
+        self.icon["nbt"] = nbt
+        return self
+
     def set_title(self, title: str) -> Advancement:
         self.title = title
         return self
