@@ -1,17 +1,17 @@
-#Fast World Creator
+# Fast World Creator
 
 Generate Minecraft worlds with your favourite datapacks in a couple clicks!
 
 
 <p align="center">
-  <img alt="GUI image" src="https://github.com/pizzaspren/FastWorldCreator/assets/images/gui.jpg">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui.jpg" width="400">
 </p>
 
 Tired of copying and pasting your datapacks every time you create a new world? Want to create a multitude of worlds in a very short time? Would you like to create worlds for different versions of Minecraft without even launching the game?
 
 Look no further, this application is just what you need!
 
-#### Features
+### Features
 * Automatically detect installed Minecraft releases.
 * Highly customizable world generation.
 * Bundled with vanilla-style datapacks to enhance your gameplay.
@@ -20,5 +20,6 @@ Look no further, this application is just what you need!
 * ...And much more!
 
 <p align="center">
+All the information can be found in the wiki!
 
-##### All the information can be found in the wiki!</p>
+</p>
