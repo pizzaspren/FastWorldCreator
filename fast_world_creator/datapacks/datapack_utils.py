@@ -2,11 +2,12 @@ import json
 import os
 import shutil
 import zipfile
-from typing import List, Type
+from typing import List, Type, Union
 
 from fast_world_creator.datapacks.convenient_crafting import \
     ConvenientCraftingDataPack
 from fast_world_creator.datapacks.datapack_base import Datapack
+from fast_world_creator.datapacks.external_datapack import ExternalDatapack
 from fast_world_creator.datapacks.more_advancements import \
     MoreAdvancementsDataPack
 from fast_world_creator.datapacks.random_loot import RandomLootDataPack
@@ -85,9 +86,15 @@ def delete_loot_tables():
     )
 
 
-def get_available_datapacks() -> List[Type[Datapack]]:
-    return [
+def get_available_datapacks() -> List[Union[str, Type[Datapack]]]:
+    datapacks = [
         RandomLootDataPack,
         ConvenientCraftingDataPack,
         MoreAdvancementsDataPack
     ]
+    external_datapack_folder = f"{os.getcwd()}/assets/imported_datapacks"
+    for z in os.listdir(external_datapack_folder):
+        if z.endswith(".zip"):
+            dp = ExternalDatapack(f"{external_datapack_folder}/{z}")
+            datapacks.append(dp)
+    return datapacks

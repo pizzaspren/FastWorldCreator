@@ -41,21 +41,34 @@ def create_layout():
 
 
 def create_datapack_layout():
-    return [[
-        sg.CB(default=True, text=d.name, tooltip=d.description) for d in
-        available_datapacks
-    ]]
+    grouped_packs = [
+        available_datapacks[i:i + 2] for i in
+        range(0, len(available_datapacks), 2)
+    ]
+    layout = []
+    for d_pair in grouped_packs:
+        layout_row = []
+        for d in d_pair:
+            layout_row.append(
+                sg.CB(
+                    default=True,
+                    text=d.name,
+                    tooltip=d.description,
+                    key=d.name
+                )
+            )
+        layout.append(layout_row)
+    return layout
 
 
-def create(sent_values):
+def create(values: dict) -> None:
+    sent_values = list(values.values())
     core.run(
         version_pair=(sent_values[0], installed_versions[sent_values[0]]),
         world_name=sent_values[1],
         seed=sent_values[2],
         difficulty=difficulties.index(sent_values[3]),
-        datapacks=[
-            dp for dp, flag in zip(available_datapacks, sent_values[4:]) if flag
-        ]
+        datapacks=[dp for dp in available_datapacks if values[dp.name]]
     )
 
 
@@ -68,7 +81,7 @@ while True:
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel
         break
     if event == "Ok":
-        create(list(value_dict.values()))
+        create(value_dict)
         break
 
 window.close()
