@@ -5,7 +5,6 @@ from datapack_creator.elements.datapacks.base_datapack import Datapack
 
 
 class RandomLootDataPack(Datapack):
-
     name = "random_loot"
     description = "Loot table randomizer"
 
@@ -36,4 +35,5 @@ class RandomLootDataPack(Datapack):
                 lt_data = file_content.read()
                 self.add_datapack_file(
                     path_in_dp=f"{lt_file}",
-                    data=lt_data)
+                    data=lt_data
+                )

@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import json
-from typing import List, Union
+from typing import List, Union, Type
 
 from datapack_creator.elements import ElementBase
 from datapack_creator.elements.advancements import AdvancementFrame
+from datapack_creator.elements.item import Item
 
 
 class Advancement(ElementBase):
 
     def __init__(self, name="empty", group="story",
                  datapack="minecraft", frame=AdvancementFrame.TASK,
-                 icon_item="minecraft:grass_block", icon_nbt="",
+                 icon=Item("minecraft:grass"),
                  title="Placeholder", background=None,
                  description="Placeholder", hidden=False, parent=None,
                  criteria=None, requirements=None, rewards=None):
@@ -21,9 +22,7 @@ class Advancement(ElementBase):
         self.datapack_name = datapack
 
         self.frame = frame
-        self.icon = dict(item=icon_item)
-        if icon_nbt:
-            self.icon["nbt"] = icon_nbt
+        self.icon = icon
         self.title = title
         self.background = background
         self.description = description
@@ -42,16 +41,8 @@ class Advancement(ElementBase):
         self.frame = str(frame)
         return self
 
-    def set_icon(self, icon: dict) -> Advancement:
+    def set_icon(self, icon: Type[Item]) -> Advancement:
         self.icon = icon
-        return self
-
-    def set_icon_item(self, item: str) -> Advancement:
-        self.icon["item"] = item
-        return self
-
-    def set_icon_nbt(self, nbt: str) -> Advancement:
-        self.icon["nbt"] = nbt
         return self
 
     def set_title(self, title: str) -> Advancement:
@@ -90,7 +81,7 @@ class Advancement(ElementBase):
 
     def _get_display(self) -> dict:
         display = dict(
-            icon=self.icon,
+            icon=self.icon.as_ingredient(),
             title=self.title,
             frame=self.frame,
             description=self.description,

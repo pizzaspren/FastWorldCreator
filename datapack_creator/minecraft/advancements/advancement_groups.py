@@ -1,5 +1,4 @@
-from datapack_creator.elements.advancements.advancement_group import \
-    AdvancementGroup
+from datapack_creator.elements.advancements import AdvancementGroup
 
 
 class McAdvancementGroups:

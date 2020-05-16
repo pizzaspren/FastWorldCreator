@@ -33,7 +33,7 @@ class WorldCreator:
             "arg_version": self.mc_version,
             "arg_world_name": self.name,
             "arg_seed": str(self.seed),
-            "datapack_list": ",".join(datapack_list or []),
+            "datapack_list": ",".join([f"{d}.zip" for d in datapack_list]),
             "arg_hardcore": str(int(mu.Difficulties(difficulty).is_hardcore())),
             "arg_diff": str(min(difficulty, 3))
         })

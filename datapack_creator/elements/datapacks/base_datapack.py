@@ -5,11 +5,9 @@ import traceback
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from datapack_creator.elements import ElementBase
-from datapack_creator.elements.advancements import Advancement
 
 
 class Datapack(ElementBase):
-
     name = str()
     description = str()
 
@@ -68,16 +66,11 @@ class Datapack(ElementBase):
             "data": data
         })
 
-    def add_recipe_file(self, name: str, data: str) -> None:
-        self.add_datapack_file(
-            path_in_dp=f"recipes/{name}.json",
-            data=data
-        )
-
-    def add_advancement(self, advancement: Advancement) -> None:
+    def add_element(self, element: ElementBase) -> None:
+        element.set_datapack(self.datapack_name)
         self.datapack_files.append({
-            "path": advancement.get_path(),
-            "data": advancement.to_data()
+            "path": element.get_path(),
+            "data": element.to_data()
         })
 
     def store(self) -> bool:

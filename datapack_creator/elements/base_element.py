@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class ElementBase:
 
     def __init__(self, datapack_name: str = "minecraft"):
@@ -8,3 +11,7 @@ class ElementBase:
 
     def to_data(self) -> str:
         return ""
+
+    def set_datapack(self, datapack_name: str) -> ElementBase:
+        self.datapack_name = datapack_name
+        return self

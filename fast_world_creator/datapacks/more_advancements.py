@@ -1,10 +1,10 @@
 from datapack_creator.elements.advancements import Advancement, AdvancementFrame
 from datapack_creator.elements.datapacks.base_datapack import Datapack
+from datapack_creator.elements.item import Item
 from datapack_creator.minecraft.advancements import McAdvancements
 
 
 class MoreAdvancementsDataPack(Datapack):
-
     name = "more_advancements"
     description = "More advancements for your game"
 
@@ -20,10 +20,9 @@ class MoreAdvancementsDataPack(Datapack):
         self._create_end_advancements()
 
     def _create_story_advancements(self):
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="enchant_item_30",
-            datapack=self.name,
-            icon_item="minecraft:experience_bottle",
+            icon=Item("minecraft:experience_bottle"),
             title="Great enchanter",
             description="Enchant while being at least level 30",
             frame=AdvancementFrame.GOAL,
@@ -34,11 +33,12 @@ class MoreAdvancementsDataPack(Datapack):
                     "conditions": {
                         "player": [{
                             "condition": "minecraft:entity_scores",
-                            "scores": [{
+                            "scores": {
                                 "level": {
-                                    "min": 30
+                                    "min": 30,
+                                    "max": 512
                                 }
-                            }],
+                            },
                             "entity": "this"
                         }]
                     }
@@ -47,10 +47,9 @@ class MoreAdvancementsDataPack(Datapack):
         ))
 
     def _create_adventure_advancements(self):
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="snow_golem",
-            datapack=self.name,
-            icon_item="minecraft:jack_o_lantern",
+            icon=Item("minecraft:jack_o_lantern"),
             title="Snowy wonderland",
             description="Summon a snow golem",
             parent=McAdvancements.Adventure.ADVENTURE,
@@ -67,8 +66,7 @@ class MoreAdvancementsDataPack(Datapack):
         ))
         charge_creeper = Advancement(
             name="charge_creeper",
-            datapack=self.name,
-            icon_item="minecraft:trident",
+            icon=Item("minecraft:trident"),
             title="Uh Oh...",
             description="Strike a Creeper with lightning",
             parent=McAdvancements.Adventure.A_THROWAWAY_JOKE,
@@ -83,11 +81,10 @@ class MoreAdvancementsDataPack(Datapack):
                 }
 
             })
-        self.add_advancement(charge_creeper)
+        self.add_element(charge_creeper)
         zombie_head = Advancement(
             name="zombie_head",
-            datapack=self.name,
-            icon_item="minecraft:zombie_head",
+            icon=Item("minecraft:zombie_head"),
             title="Brains?",
             description="Obtain a Zombie head",
             parent=charge_creeper,
@@ -99,7 +96,8 @@ class MoreAdvancementsDataPack(Datapack):
                             {
                                 "item": "minecraft:zombie_head",
                                 "count": {
-                                    "min": 1
+                                    "min": 1,
+                                    "max": 64
                                 }
                             }
                         ]
@@ -107,11 +105,10 @@ class MoreAdvancementsDataPack(Datapack):
                 }
             }
         )
-        self.add_advancement(zombie_head)
-        self.add_advancement(Advancement(
+        self.add_element(zombie_head)
+        self.add_element(Advancement(
             name="skeleton_skull",
-            datapack=self.name,
-            icon_item="minecraft:skeleton_skull",
+            icon=Item("minecraft:skeleton_skull"),
             title="Doot",
             description="Obtain a Skeleton skull",
             parent=charge_creeper,
@@ -123,7 +120,8 @@ class MoreAdvancementsDataPack(Datapack):
                             {
                                 "item": "minecraft:skeleton_skull",
                                 "count": {
-                                    "min": 1
+                                    "min": 1,
+                                    "max": 64
                                 }
                             }
                         ]
@@ -131,11 +129,10 @@ class MoreAdvancementsDataPack(Datapack):
                 }
             }
         ))
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="creeper_head",
-            datapack=self.name,
             group="adventure",
-            icon_item="minecraft:creeper_head",
+            icon=Item("minecraft:creeper_head"),
             title="SSSsss...",
             description="Obtain a Creeper head",
             parent=charge_creeper,
@@ -145,10 +142,7 @@ class MoreAdvancementsDataPack(Datapack):
                     "conditions": {
                         "items": [
                             {
-                                "item": "minecraft:creeper_head",
-                                "count": {
-                                    "min": 1
-                                }
+                                "item": "minecraft:creeper_head"
                             }
                         ]
                     }
@@ -157,11 +151,9 @@ class MoreAdvancementsDataPack(Datapack):
         ))
 
     def _create_husbandry_advancements(self):
-        # FixMe: inventory_changed advancements get triggered on load
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="fish_enchanted_book",
-            datapack=self.name,
-            icon_item="minecraft:enchanted_book",
+            icon=Item("minecraft:enchanted_book"),
             title="Magical catch",
             description="Fish an enchanted book",
             parent=McAdvancements.Husbandry.FISHY_BUSINESS,
@@ -178,10 +170,9 @@ class MoreAdvancementsDataPack(Datapack):
         ))
 
     def _create_nether_advancements(self):
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="nether_roof",
-            datapack=self.name,
-            icon_item="minecraft:bedrock",
+            icon=Item("minecraft:bedrock"),
             title="Superflat!",
             description="Stand on the nether roof",
             frame=AdvancementFrame.CHALLENGE,
@@ -194,7 +185,8 @@ class MoreAdvancementsDataPack(Datapack):
                         "dimension": "minecraft:nether",
                         "position": {
                             "y": {
-                                "min": 128
+                                "min": 128,
+                                "max": 256
                             }
                         }
                     }
@@ -203,10 +195,9 @@ class MoreAdvancementsDataPack(Datapack):
         ))
 
     def _create_end_advancements(self):
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="fall_into_void",
-            datapack=self.name,
-            icon_item="minecraft:feather",
+            icon=Item("minecraft:feather"),
             title="Stop, Drop and Void",
             description="Fall into the void",
             frame=AdvancementFrame.GOAL,
@@ -226,8 +217,7 @@ class MoreAdvancementsDataPack(Datapack):
         ))
         eat_chorus = Advancement(
             name="eat_chorus",
-            datapack=self.name,
-            icon_item="minecraft:chorus_fruit",
+            icon=Item("minecraft:chorus_fruit"),
             title="Zoop",
             description="Eat a Chorus fruit",
             parent=McAdvancements.End.THE_END,
@@ -240,11 +230,10 @@ class MoreAdvancementsDataPack(Datapack):
                 }
             }
         )
-        self.add_advancement(eat_chorus)
-        self.add_advancement(Advancement(
+        self.add_element(eat_chorus)
+        self.add_element(Advancement(
             name="plant_chorus",
-            datapack=self.name,
-            icon_item="minecraft:chorus_flower",
+            icon=Item("minecraft:chorus_flower"),
             title="Reforestation",
             description="Plant a Chorus flower on End stone",
             parent=eat_chorus,
@@ -257,64 +246,47 @@ class MoreAdvancementsDataPack(Datapack):
                 }
             }
         ))
-        # FixMe: inventory_changed advancements get triggered on load
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="craft_shulker_box",
-            datapack=self.name,
-            icon_item="minecraft:shulker_box",
+            icon=Item("minecraft:shulker_box"),
             title="Portable storage",
             description="Craft a Shulker Box",
             parent=McAdvancements.End.THE_CITY_AT_THE_END_OF_THE_GAME,
             criteria={
                 "craft_shulker_box": {
                     "trigger": "minecraft:inventory_changed",
-                    "items": {
-                        "item": "minecraft:shulker_box",
-                        "count": {
-                            "min": 1,
-                            "max": 64
-                        }
-                    },
-                    "player": {
-                        "entity_scores": {
-                            "entity": "this",
-                            "scores": [
-                                {
-                                    "minecraft.crafted:minecraft.shulker_box": {
-                                        "min": 1
-                                    }
-                                }
-                            ]
-                        }
+                    "conditions": {
+                        "items": [
+                            {
+                                "item": "minecraft:shulker_box"
+                            }
+                        ]
                     }
                 }
             }
         ))
-        # FixMe: inventory_changed advancements get triggered on load
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="find_dragon_head",
-            datapack=self.name,
-            icon_item="minecraft:dragon_head",
+            icon=Item("minecraft:dragon_head"),
             title="End souvenir",
             description="Obtain a Dragon Head",
             parent=McAdvancements.End.THE_CITY_AT_THE_END_OF_THE_GAME,
             criteria={
                 "find_dragon_head": {
                     "trigger": "minecraft:inventory_changed",
-                    "items": {
-                        "item": "minecraft:dragon_head",
-                        "count": {
-                            "min": 1
-                        }
+                    "conditions": {
+                        "items": [
+                            {
+                                "item": "minecraft:dragon_head"
+                            }
+                        ]
                     }
                 }
             }
         ))
-        self.add_advancement(Advancement(
+        self.add_element(Advancement(
             name="break_elytra",
-            datapack=self.name,
-            icon_item="minecraft:elytra",
-            icon_nbt="{Damage:431}",
+            icon=Item("minecraft:elytra", "{Damage:431}"),
             title="Durability's the Limit",
             description="Deplete an elytra's durability",
             parent=McAdvancements.End.SKYS_THE_LIMIT,
