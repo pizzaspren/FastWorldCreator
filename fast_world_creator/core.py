@@ -1,8 +1,7 @@
 import random
 
-from fast_world_creator.datapacks import datapack_utils as du
 from fast_world_creator.new_world import world_creator
-from fast_world_creator.utils import common_utils as cu
+from fast_world_creator.utils import common_utils as cu, datapack_utils as du
 
 
 def run(version_pair, world_name, seed, datapacks=[], difficulty=2):

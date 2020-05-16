@@ -1,8 +1,8 @@
 import PySimpleGUIQt as sg
 
 from fast_world_creator import core
-from fast_world_creator.datapacks import datapack_utils
-from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu
+from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu, \
+    datapack_utils
 
 sg.theme('DarkAmber')  # Add a touch of color
 
@@ -45,20 +45,27 @@ def create_datapack_layout():
         available_datapacks[i:i + 2] for i in
         range(0, len(available_datapacks), 2)
     ]
-    layout = []
+    c1_layout, c2_layout = [], []
     for d_pair in grouped_packs:
-        layout_row = []
-        for d in d_pair:
-            layout_row.append(
-                sg.CB(
-                    default=True,
-                    text=d.name,
-                    tooltip=d.description,
-                    key=d.name
-                )
-            )
-        layout.append(layout_row)
-    return layout
+        c1_layout.append([
+            sg.CB(
+                default=True,
+                text=d_pair[0].name,
+                tooltip=d_pair[0].description,
+                key=d_pair[0].name
+            ),
+            sg.Stretch()
+        ])
+        c2_layout.append([
+            sg.CB(
+                default=True,
+                text=d_pair[1].name,
+                tooltip=d_pair[1].description,
+                key=d_pair[1].name
+            ),
+            sg.Stretch()
+        ])
+    return [[sg.Column(c1_layout), sg.Column(c2_layout)]]
 
 
 def create(values: dict) -> None:

@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from fast_world_creator.datapacks.datapack_base import Datapack
+from datapack_creator.elements.datapacks.base_datapack import Datapack
 
 
 class ExternalDatapack(Datapack):

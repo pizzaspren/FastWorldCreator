@@ -1,7 +1,7 @@
 import os
 import random
 
-from fast_world_creator.datapacks.datapack_base import Datapack
+from datapack_creator.elements.datapacks.base_datapack import Datapack
 
 
 class RandomLootDataPack(Datapack):
@@ -11,10 +11,12 @@ class RandomLootDataPack(Datapack):
 
     def __init__(self):
         super().__init__()
+        # Override minecraft files
+        self.datapack_name = "minecraft"
 
     @staticmethod
     def needs_loot_tables():
-        return False
+        return True
 
     def _create_others(self, seed: int = None) -> None:
         self._add_loot_tables(seed)
@@ -33,5 +35,5 @@ class RandomLootDataPack(Datapack):
             with open(lt_content) as file_content:
                 lt_data = file_content.read()
                 self.add_datapack_file(
-                    path=f"data/minecraft/{lt_file}",
+                    path_in_dp=f"{lt_file}",
                     data=lt_data)

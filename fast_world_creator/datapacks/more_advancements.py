@@ -1,8 +1,10 @@
-from fast_world_creator.datapacks.datapack_base import Datapack
-from fast_world_creator.minecraft.advancements import *
+from datapack_creator.elements.advancements import Advancement, AdvancementFrame
+from datapack_creator.elements.datapacks.base_datapack import Datapack
+from datapack_creator.minecraft.advancements import McAdvancements
 
 
 class MoreAdvancementsDataPack(Datapack):
+
     name = "more_advancements"
     description = "More advancements for your game"
 
@@ -310,6 +312,7 @@ class MoreAdvancementsDataPack(Datapack):
         ))
         self.add_advancement(Advancement(
             name="break_elytra",
+            datapack=self.name,
             icon_item="minecraft:elytra",
             icon_nbt="{Damage:431}",
             title="Durability's the Limit",

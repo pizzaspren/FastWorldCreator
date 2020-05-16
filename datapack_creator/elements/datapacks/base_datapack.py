@@ -4,12 +4,18 @@ import os
 import traceback
 from zipfile import ZipFile, ZIP_DEFLATED
 
+from datapack_creator.elements import ElementBase
+from datapack_creator.elements.advancements import Advancement
 
-class Datapack:
+
+class Datapack(ElementBase):
+
     name = str()
     description = str()
 
     def __init__(self):
+        super(Datapack, self).__init__()
+        self.datapack_name = self.name
         self.datapack_files = list()
 
     @staticmethod
@@ -17,18 +23,18 @@ class Datapack:
         return False
 
     def create_datapack_files(self, *args, **kwargs):
-        self.add_datapack_file(
-            path='pack.mcmeta',
-            data=json.dumps(
+        self.datapack_files.append({
+            "path": 'pack.mcmeta',
+            "data": json.dumps(
                 {
                     "pack": {
-                        "pack_format": 1,
+                        "pack_format": 5,
                         "description": f"{self.description}"
                     }
                 },
                 indent=4
             )
-        )
+        })
         self._create_datapack_files(*args, **kwargs)
         return self.store()
 
@@ -56,35 +62,29 @@ class Datapack:
     def _create_others(self, *args, **kwargs):
         pass
 
-    def add_datapack_file(self, path: str, data: str) -> None:
+    def add_datapack_file(self, path_in_dp: str, data: str) -> None:
         self.datapack_files.append({
-            "path": path,
+            "path": f"{self.get_path()}/{path_in_dp}",
             "data": data
         })
 
     def add_recipe_file(self, name: str, data: str) -> None:
         self.add_datapack_file(
-            path=f"data/{self.name}/recipes/{name}.json",
+            path_in_dp=f"recipes/{name}.json",
             data=data
         )
 
-    def add_advancement(self, advancement):
-        self.add_datapack_file(
-            path=advancement.get_path(),
-            data=advancement.to_data()
-        )
-
-    def add_advancement_file(self, group: str, name: str, data: str) -> None:
-        self.add_datapack_file(
-            path=f"data/{self.name}/advancements/{group}/{name}.json",
-            data=data
-        )
+    def add_advancement(self, advancement: Advancement) -> None:
+        self.datapack_files.append({
+            "path": advancement.get_path(),
+            "data": advancement.to_data()
+        })
 
     def store(self) -> bool:
         try:
             self._store()
             return True
-        except Exception:
+        except:
             traceback.print_exc()
             return False
 

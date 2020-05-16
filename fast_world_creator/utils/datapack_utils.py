@@ -4,17 +4,13 @@ import shutil
 import zipfile
 from typing import List, Type, Union
 
-from fast_world_creator.datapacks.convenient_crafting import \
-    ConvenientCraftingDataPack
-from fast_world_creator.datapacks.datapack_base import Datapack
+from datapack_creator.elements.datapacks.base_datapack import Datapack
+from fast_world_creator.datapacks import *
 from fast_world_creator.datapacks.external_datapack import ExternalDatapack
-from fast_world_creator.datapacks.more_advancements import \
-    MoreAdvancementsDataPack
-from fast_world_creator.datapacks.random_loot import RandomLootDataPack
 from fast_world_creator.utils import common_utils as cu
 
 
-def create_shaped_crafting_recipe(pattern, key, result, result_amount=1):
+def create_shaped_crafting_recipe(pattern, key, result, result_amount=1) -> str:
     return json.dumps({
         "type": "minecraft:crafting_shaped",
         "pattern": pattern,
@@ -26,7 +22,7 @@ def create_shaped_crafting_recipe(pattern, key, result, result_amount=1):
     })
 
 
-def create_shapeless_crafting_recipe(items, result, result_amount=1):
+def create_shapeless_crafting_recipe(items, result, result_amount=1) -> str:
     return json.dumps({
         "type": "minecraft:crafting_shapeless",
         "ingredients": [dict(item=i) for i in items],
@@ -37,7 +33,7 @@ def create_shapeless_crafting_recipe(items, result, result_amount=1):
     })
 
 
-def create_furnace_recipe(recipe_type, items, result, xp, cooking_time):
+def create_furnace_recipe(recipe_type, items, result, xp, cooking_time) -> str:
     return json.dumps({
         "type": recipe_type,
         "ingredient": [dict(item=i) for i in items],
@@ -47,22 +43,22 @@ def create_furnace_recipe(recipe_type, items, result, xp, cooking_time):
     })
 
 
-def create_smelting_recipe(items, result, xp=0.1, cooking_time=200):
+def create_smelting_recipe(items, result, xp=0.1, cooking_time=200) -> str:
     return create_furnace_recipe("minecraft:smelting",
                                  items, result, xp, cooking_time)
 
 
-def create_smoking_recipe(items, result, xp=0.1, cooking_time=100):
+def create_smoking_recipe(items, result, xp=0.1, cooking_time=100) -> str:
     return create_furnace_recipe("minecraft:smoking",
                                  items, result, xp, cooking_time)
 
 
-def create_blasting_recipe(items, result, xp=0.1, cooking_time=100):
+def create_blasting_recipe(items, result, xp=0.1, cooking_time=100) -> str:
     return create_furnace_recipe("minecraft:blasting",
                                  items, result, xp, cooking_time)
 
 
-def extract_loot_tables(jar_path: str):
+def extract_loot_tables(jar_path: str) -> None:
     """ Extracts the folder 'data/minecraft/loot_tables' from the jar. """
     cu.log(f"Extracting {os.path.split(jar_path)[-1]} loot tables")
     with zipfile.ZipFile(jar_path) as jar_file:
@@ -79,7 +75,7 @@ def extract_loot_tables(jar_path: str):
                     item_file.write(jar_file.read(item))
 
 
-def delete_loot_tables():
+def delete_loot_tables() -> None:
     shutil.rmtree(
         os.sep.join([os.getcwd(), "loot_tables"]),
         ignore_errors=True
