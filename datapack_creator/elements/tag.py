@@ -3,7 +3,7 @@ class Tag:
     def __init__(self, name):
         self.name = name
 
-    def to_ingredient(self):
+    def as_ingredient(self):
         """To be used in shaped crafting recipes"""
         return dict(tag=self.name)
 

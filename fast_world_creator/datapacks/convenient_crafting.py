@@ -24,7 +24,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Item("minecraft:iron_ore").as_ingredient(),
-                "C": coals.to_ingredient()
+                "C": coals.as_ingredient()
             },
             iron_ingot, 8
         ))
@@ -37,7 +37,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Item("minecraft:gold_ore").as_ingredient(),
-                "C": coals.to_ingredient()
+                "C": coals.as_ingredient()
             },
             Item("minecraft:gold_ingot"), 8
         ))
@@ -49,7 +49,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Item("minecraft:diamond_ore").as_ingredient(),
-                "C": coals.to_ingredient()
+                "C": coals.as_ingredient()
             },
             Item("minecraft:diamond"), 8
         ))
@@ -62,7 +62,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Item("minecraft:nether_quartz_ore").as_ingredient(),
-                "C": coals.to_ingredient()
+                "C": coals.as_ingredient()
             },
             Item("minecraft:quartz"), 8
         ))
@@ -75,7 +75,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Item("minecraft:lapis_ore").as_ingredient(),
-                "C": coals.to_ingredient()
+                "C": coals.as_ingredient()
             },
             Item("minecraft:lapis_lazuli"), 8
         ))
@@ -88,7 +88,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Item("minecraft:redstone_ore").as_ingredient(),
-                "C": coals.to_ingredient()
+                "C": coals.as_ingredient()
             },
             Item("minecraft:redstone"), 8
         ))
@@ -100,8 +100,8 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Tag("minecraft:logs_that_burn").to_ingredient(),
-                "C": coals.to_ingredient()
+                "I": Tag("minecraft:logs_that_burn").as_ingredient(),
+                "C": coals.as_ingredient()
             },
             Item("minecraft:charcoal"), 8
         ))
@@ -187,7 +187,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "D": Item("minecraft:white_dye").as_ingredient(),
-                "W": Tag("minecraft:wool").to_ingredient()
+                "W": Tag("minecraft:wool").as_ingredient()
             },
             Item("minecraft:white_wool"), 8
         ))
