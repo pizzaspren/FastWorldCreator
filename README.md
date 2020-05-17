@@ -1,7 +1,9 @@
-# Fast World Creator
+# Fast World Creator 
+![GitHub last commit](https://img.shields.io/github/last-commit/pizzaspren/FastWorldCreator)
+![GitHub issues](https://img.shields.io/github/issues-raw/pizzaspren/FastWorldCreator?label=issues)
+[![Discord Shield](https://discordapp.com/api/guilds/693213117177659454/widget.png?style=shield)](https://discord.gg/MkhUUbY)
 
 Generate Minecraft worlds with your favourite datapacks in a couple clicks!
-
 
 <p align="center">
   <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui.jpg" width="400">
@@ -19,7 +21,6 @@ Look no further, this application is just what you need!
 * Select which datapacks you want to add to your world with a simple click.
 * ...And much more!
 
-<p align="center">
-All the information can be found in the wiki!
 
-</p>
+All the information can be found in the [wiki](https://github.com/pizzaspren/FastWorldCreator/wiki)!
+

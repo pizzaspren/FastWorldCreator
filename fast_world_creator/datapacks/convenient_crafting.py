@@ -1,7 +1,8 @@
 from datapack_creator.elements.datapacks.base_datapack import Datapack
-from datapack_creator.elements.item import Item
 from datapack_creator.elements.recipes import *
 from datapack_creator.elements.tag import Tag
+from datapack_creator.minecraft.items import McItems
+from datapack_creator.minecraft.tags.item_tags import McItemTags
 
 
 class ConvenientCraftingDataPack(Datapack):
@@ -12,9 +13,6 @@ class ConvenientCraftingDataPack(Datapack):
         super().__init__()
 
     def _shaped_recipes(self):
-        iron_ingot = Item("minecraft:iron_ingot")
-        coals = Tag("minecraft:coals")
-
         self.add_element(ShapedCraftingRecipe(
             "iron_ingot",
             [
@@ -23,10 +21,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Item("minecraft:iron_ore").as_ingredient(),
-                "C": coals.as_ingredient()
+                "I": McItems.IRON_ORE.as_ingredient(),
+                "C": McItemTags.COALS.as_ingredient()
             },
-            iron_ingot, 8
+            McItems.IRON_INGOT, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "gold_ingot",
@@ -36,10 +34,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Item("minecraft:gold_ore").as_ingredient(),
-                "C": coals.as_ingredient()
+                "I": McItems.GOLD_ORE.as_ingredient(),
+                "C": McItemTags.COALS.as_ingredient()
             },
-            Item("minecraft:gold_ingot"), 8
+            McItems.GOLD_INGOT, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "diamond", [
@@ -48,10 +46,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Item("minecraft:diamond_ore").as_ingredient(),
-                "C": coals.as_ingredient()
+                "I": McItems.DIAMOND_ORE.as_ingredient(),
+                "C": McItemTags.COALS.as_ingredient()
             },
-            Item("minecraft:diamond"), 8
+            McItems.DIAMOND, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "quartz2",
@@ -61,10 +59,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Item("minecraft:nether_quartz_ore").as_ingredient(),
-                "C": coals.as_ingredient()
+                "I": McItems.NETHER_QUARTZ_ORE.as_ingredient(),
+                "C": McItemTags.COALS.as_ingredient()
             },
-            Item("minecraft:quartz"), 8
+            McItems.QUARTZ, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "lapis_lazuli",
@@ -74,10 +72,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Item("minecraft:lapis_ore").as_ingredient(),
-                "C": coals.as_ingredient()
+                "I": McItems.LAPIS_ORE.as_ingredient(),
+                "C": McItemTags.COALS.as_ingredient()
             },
-            Item("minecraft:lapis_lazuli"), 8
+            McItems.LAPIS_LAZULI, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "redstone",
@@ -87,10 +85,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Item("minecraft:redstone_ore").as_ingredient(),
-                "C": coals.as_ingredient()
+                "I": McItems.REDSTONE_ORE.as_ingredient(),
+                "C": McItemTags.COALS.as_ingredient()
             },
-            Item("minecraft:redstone"), 8
+            McItems.REDSTONE, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "charcoal",
@@ -101,9 +99,9 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "I": Tag("minecraft:logs_that_burn").as_ingredient(),
-                "C": coals.as_ingredient()
+                "C": McItemTags.COALS.as_ingredient()
             },
-            Item("minecraft:charcoal"), 8
+            McItems.CHARCOAL, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "chest_minecart",
@@ -112,10 +110,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": iron_ingot.as_ingredient(),
-                "C": Item("minecraft:chest").as_ingredient()
+                "I": McItems.IRON_INGOT.as_ingredient(),
+                "C": McItems.CHEST.as_ingredient()
             },
-            Item("minecraft:chest_minecart"), 1
+            McItems.CHEST_MINECART, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "furnace_minecart",
@@ -124,10 +122,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": iron_ingot.as_ingredient(),
-                "C": Item("minecraft:furnace").as_ingredient()
+                "I": McItems.IRON_INGOT.as_ingredient(),
+                "C": McItems.FURNACE.as_ingredient()
             },
-            Item("minecraft:furnace_minecart"), 1
+            McItems.FURNACE_MINECART, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "hopper_minecart",
@@ -136,10 +134,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": iron_ingot.as_ingredient(),
-                "C": Item("minecraft:hopper").as_ingredient()
+                "I": McItems.IRON_INGOT.as_ingredient(),
+                "C": McItems.HOPPER.as_ingredient()
             },
-            Item("minecraft:hopper_minecart"), 1
+            McItems.HOPPER_MINECART, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "tnt_minecart",
@@ -148,10 +146,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": iron_ingot.as_ingredient(),
-                "C": Item("minecraft:tnt").as_ingredient()
+                "I": McItems.IRON_INGOT.as_ingredient(),
+                "C": McItems.TNT.as_ingredient()
             },
-            Item("minecraft:tnt_minecart"), 1
+            McItems.TNT_MINECART, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "enchanted_golden_apple",
@@ -161,10 +159,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "GGG"
             ],
             {
-                "G": Item("minecraft:gold_block").as_ingredient(),
-                "A": Item("minecraft:apple").as_ingredient()
+                "G": McItems.GOLD_BLOCK.as_ingredient(),
+                "A": McItems.APPLE.as_ingredient()
             },
-            Item("minecraft:enchanted_golden_apple"), 1
+            McItems.ENCHANTED_GOLDEN_APPLE, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "saddle",
@@ -173,10 +171,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "HLH"
             ],
             {
-                "L": Item("minecraft:leather").as_ingredient(),
-                "H": Item("minecraft:tripwire_hook").as_ingredient()
+                "L": McItems.LEATHER.as_ingredient(),
+                "H": McItems.TRIPWIRE_HOOK.as_ingredient()
             },
-            Item("minecraft:saddle"), 1
+            McItems.SADDLE, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "white_wool",
@@ -186,10 +184,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "WWW"
             ],
             {
-                "D": Item("minecraft:white_dye").as_ingredient(),
+                "D": McItems.WHITE_DYE.as_ingredient(),
                 "W": Tag("minecraft:wool").as_ingredient()
             },
-            Item("minecraft:white_wool"), 8
+            McItems.WHITE_WOOL, 8
         ))
         self.add_element(ShapedCraftingRecipe(
             "grass_block",
@@ -198,10 +196,10 @@ class ConvenientCraftingDataPack(Datapack):
                 "D"
             ],
             {
-                "G": Item("minecraft:grass").as_ingredient(),
-                "D": Item("minecraft:dirt").as_ingredient()
+                "G": McItems.GRASS.as_ingredient(),
+                "D": McItems.DIRT.as_ingredient()
             },
-            Item("minecraft:grass_block"), 1
+            McItems.GRASS_BLOCK, 1
         ))
         self.add_element(ShapedCraftingRecipe(
             "snow_block",
@@ -210,82 +208,82 @@ class ConvenientCraftingDataPack(Datapack):
                 "SS"
             ],
             {
-                "S": Item("minecraft:snow").as_ingredient()
+                "S": McItems.SNOW.as_ingredient()
             },
-            Item("minecraft:snow_block"), 1
+            McItems.SNOW_BLOCK, 1
         ))
 
     def _shapeless_recipes(self):
         self.add_element(ShapelessCraftingRecipe(
             "book",
-            Item("minecraft:leather") * 1 + Item("minecraft:sugar_cane") * 3,
-            Item("minecraft:book"), 1
+            McItems.LEATHER * 1 + McItems.SUGAR_CANE * 3,
+            McItems.BOOK, 1
         ))
         self.add_element(ShapelessCraftingRecipe(
             "bone_block",
-            Item("minecraft:bone") * 3,
-            Item("minecraft:bone_block"), 1
+            McItems.BONE * 3,
+            McItems.BONE_BLOCK, 1
         ))
         self.add_element(ShapelessCraftingRecipe(
             "clay_ball",
-            Item("minecraft:clay") * 1,
-            Item("minecraft:clay_ball"), 4
+            McItems.CLAY * 1,
+            McItems.CLAY_BALL, 4
         ))
         self.add_element(ShapelessCraftingRecipe(
             "honeycomb",
-            Item("minecraft:honeycomb_block") * 1,
-            Item("minecraft:honeycomb"), 4
+            McItems.HONEYCOMB_BLOCK * 1,
+            McItems.HONEYCOMB, 4
         ))
         self.add_element(ShapelessCraftingRecipe(
             "brick",
-            Item("minecraft:bricks") * 1,
-            Item("minecraft:brick"), 4
+            McItems.BRICKS * 1,
+            McItems.BRICK, 4
         ))
         self.add_element(ShapelessCraftingRecipe(
             "quartz",
-            Item("minecraft:quartz_block") * 1,
-            Item("minecraft:quartz"), 4
+            McItems.QUARTZ_BLOCK * 1,
+            McItems.QUARTZ, 4
         ))
         self.add_element(ShapelessCraftingRecipe(
             "glass",
-            Item("minecraft:glowstone") * 1,
-            Item("minecraft:glowstone_dust"), 4
+            McItems.GLOWSTONE * 1,
+            McItems.GLOWSTONE_DUST, 4
         ))
         self.add_element(ShapelessCraftingRecipe(
             "flint",
-            Item("minecraft:gravel") * 1,
-            Item("minecraft:flint"), 1
+            McItems.GRAVEL * 1,
+            McItems.FLINT, 1
         ))
         self.add_element(ShapelessCraftingRecipe(
             "name_tag",
-            Item("minecraft:lead") * 1 + Item("minecraft:paper") * 1,
-            Item("minecraft:name_tag"), 1
+            McItems.LEAD * 1 + McItems.PAPER * 1,
+            McItems.NAME_TAG, 1
         ))
         self.add_element(ShapelessCraftingRecipe(
             "string",
-            Item("minecraft:white_wool") * 1,
-            Item("minecraft:string"), 4
+            McItems.WHITE_WOOL * 1,
+            McItems.STRING, 4
         ))
         self.add_element(ShapelessCraftingRecipe(
             "ice",
-            Item("minecraft:packed_ice") * 1,
-            Item("minecraft:ice"), 9
+            McItems.PACKED_ICE * 1,
+            McItems.ICE, 9
         ))
         self.add_element(ShapelessCraftingRecipe(
             "packed_ice",
-            Item("minecraft:blue_ice") * 1,
-            Item("minecraft:packed_ice"), 9
+            McItems.BLUE_ICE * 1,
+            McItems.PACKED_ICE, 9
         ))
 
         self.add_element(ShapelessCraftingRecipe(
             "coalblock",
-            Item("minecraft:charcoal") * 9,
-            Item("minecraft:coal_block"), 1
+            McItems.CHARCOAL * 9,
+            McItems.COAL_BLOCK, 1
         ))
 
     def _smoking_recipes(self):
         self.add_element(SmokingRecipe(
             "smoking_leather",
-            Item("minecraft:rotten_flesh").as_ingredient(),
-            Item("minecraft:leather")
+            McItems.ROTTEN_FLESH.as_ingredient(),
+            McItems.LEATHER
         ))
