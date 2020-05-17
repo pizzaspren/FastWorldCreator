@@ -1,4 +1,5 @@
 # Fast World Creator 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/pizzaspren/FastWorldCreator)
 ![GitHub last commit](https://img.shields.io/github/last-commit/pizzaspren/FastWorldCreator)
 ![GitHub issues](https://img.shields.io/github/issues-raw/pizzaspren/FastWorldCreator?label=issues)
 [![Discord Shield](https://discordapp.com/api/guilds/693213117177659454/widget.png?style=shield)](https://discord.gg/MkhUUbY)
