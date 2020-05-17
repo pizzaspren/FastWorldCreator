@@ -1,4 +1,4 @@
-from datapack_creator.elements.recipes.base_recipe import RecipeBase
+from .base_recipe import RecipeBase
 
 
 class CookingRecipeBase(RecipeBase):

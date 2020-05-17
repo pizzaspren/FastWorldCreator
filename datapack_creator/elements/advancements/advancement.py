@@ -4,8 +4,8 @@ import json
 from typing import List, Union, Type
 
 from datapack_creator.elements import ElementBase
-from datapack_creator.elements.advancements import AdvancementFrame
 from datapack_creator.elements.item import Item
+from .advancement_frame import AdvancementFrame
 
 
 class Advancement(ElementBase):

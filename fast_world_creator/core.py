@@ -4,10 +4,11 @@ from fast_world_creator.new_world import world_creator
 from fast_world_creator.utils import common_utils as cu, datapack_utils as du
 
 
-def run(version_pair, world_name, seed, datapacks=[], difficulty=2):
+def run(version_pair, world_name, seed, datapacks=[], gamerules={},
+        difficulty=2):
     wc = world_creator.WorldCreator(
         mc_version=version_pair[0],
-        world_name=world_name or f"FastNewWorld_{random.randint(0,1000000)}",
+        world_name=world_name or f"FastNewWorld_{random.randint(0, 1000000)}",
         seed=seed
     )
     owd = cu.change_directory(wc.create_world_directory())
@@ -21,5 +22,6 @@ def run(version_pair, world_name, seed, datapacks=[], difficulty=2):
     du.delete_loot_tables()
     wc.create_level_dat(
         datapack_list=[d.name for d in datapacks],
-        difficulty=difficulty)
+        difficulty=difficulty,
+        gamerules=gamerules)
     cu.change_directory(owd)

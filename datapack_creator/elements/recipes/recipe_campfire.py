@@ -1,5 +1,4 @@
-from datapack_creator.elements.recipes.base_cooking_recipe import \
-    CookingRecipeBase
+from .base_cooking_recipe import CookingRecipeBase
 
 
 class CampfireCookingRecipe(CookingRecipeBase):

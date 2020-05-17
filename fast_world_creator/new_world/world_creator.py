@@ -1,3 +1,4 @@
+import json
 import os
 import random
 from typing import List
@@ -25,7 +26,8 @@ class WorldCreator:
     def create_datapack_directory(self) -> None:
         os.mkdir(os.sep.join([self.w_dir, "datapacks"]))
 
-    def create_level_dat(self, datapack_list: List[str], difficulty: int = 2) -> None:
+    def create_level_dat(self, datapack_list: List[str], difficulty: int = 2,
+                         gamerules: dict = None) -> None:
         """ Creates the level.dat NBT file in the new world folder. """
         from fast_world_creator.new_world.level_dat import LevelFile
         world_level_dat = os.sep.join([self.w_dir, "level.dat"])
@@ -35,6 +37,7 @@ class WorldCreator:
             "arg_seed": str(self.seed),
             "datapack_list": ",".join([f"{d}.zip" for d in datapack_list]),
             "arg_hardcore": str(int(mu.Difficulties(difficulty).is_hardcore())),
-            "arg_diff": str(min(difficulty, 3))
+            "arg_diff": str(min(difficulty, 3)),
+            "arg_gamerules": json.dumps(gamerules or {})
         })
         level_file.save(filename=world_level_dat)

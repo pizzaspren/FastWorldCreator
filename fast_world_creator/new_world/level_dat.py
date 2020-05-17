@@ -61,14 +61,22 @@ LevelData = schema('LevelData', {
         'announceAdvancements': tag.String,
         'commandBlockOutput': tag.String,
         'disableElytraMovementCheck': tag.String,
+        'disableRaids': tag.String,
         'doDaylightCycle': tag.String,
         'doEntityDrops': tag.String,
         'doFireTick': tag.String,
+        'doInsomnia': tag.String,
+        'doImmediateRespawn': tag.String,
         'doLimitedCrafting': tag.String,
         'doMobLoot': tag.String,
         'doMobSpawning': tag.String,
+        'doPatrolSpawning': tag.String,
         'doTileDrops': tag.String,
+        'doTraderSpawning': tag.String,
         'doWeatherCycle': tag.String,
+        'drowningDamage': tag.String,
+        'fallDamage': tag.String,
+        'fireDamage': tag.String,
         'keepInventory': tag.String,
         'logAdminCommands': tag.String,
         'maxCommandChainLength': tag.String,
@@ -164,10 +172,47 @@ def get_level_dat_template():
                 Enabled: [datapack_list]
             },
             hardcore: arg_hardcoreb,
-            Difficulty: arg_diffb
+            Difficulty: arg_diffb,
+            GameRules: arg_gamerules
         }
     }}
     """
+
+
+def get_default_gamerules():
+    return {
+        'announceAdvancements': True,
+        'commandBlockOutput': True,
+        'disableElytraMovementCheck': False,
+        'disableRaids': False,
+        'doDaylightCycle': True,
+        'doEntityDrops': True,
+        'doFireTick': True,
+        'doInsomnia': True,
+        'doImmediateRespawn': False,
+        'doLimitedCrafting': False,
+        'doMobLoot': True,
+        'doMobSpawning': True,
+        'doPatrolSpawning': True,
+        'doTileDrops': True,
+        'doTraderSpawning': True,
+        'doWeatherCycle': True,
+        'drowningDamage': True,
+        'fallDamage': True,
+        'fireDamage': True,
+        'keepInventory': False,
+        'logAdminCommands': True,
+        'maxCommandChainLength': 65536,
+        'maxEntityCramming': 24,
+        'mobGriefing': True,
+        'naturalRegeneration': True,
+        'randomTickSpeed': 3,
+        'reducedDebugInfo': False,
+        'sendCommandFeedback': True,
+        'showDeathMessages': True,
+        'spawnRadius': 10,
+        'spectatorsGenerateChunks': True,
+    }
 
 
 if __name__ == "__main__":

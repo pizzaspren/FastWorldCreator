@@ -5,9 +5,12 @@
 
 Generate Minecraft worlds with your favourite datapacks in a couple clicks!
 
-<p align="center">
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui.jpg" width="400">
-</p>
+<details>
+  <summary>GUI images</summary>
+  
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_main.png" width="400">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_gamerules.png" width="400">
+</details>
 
 Tired of copying and pasting your datapacks every time you create a new world? Want to create a multitude of worlds in a very short time? Would you like to create worlds for different versions of Minecraft without even launching the game?
 
