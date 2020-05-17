@@ -28,8 +28,7 @@ Look no further, this application is just what you need!
 * Python 3.7+
     * PySimpleGUI 4.19.0+
     * nbtlib 1.6.5+
-
-* *Executable file to be released soon. For the time being, application can only be run via code.*
+* Or just run the .exe!
 
 
 All the information can be found in the [wiki](https://github.com/pizzaspren/FastWorldCreator/wiki)!

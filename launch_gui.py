@@ -80,24 +80,23 @@ def create_datapack_layout():
                 tooltip=d_pair[0].description,
                 key=d_pair[0].name,
                 size=(15, 1)
-            ),
-            sg.Stretch()
+            )
         ])
-        c2_layout.append([
-            sg.CB(
-                default=True,
-                text=d_pair[1].name,
-                tooltip=d_pair[1].description,
-                key=d_pair[1].name,
-                size=(15, 1)
-            ),
-            sg.Stretch()
-        ])
+        if len(d_pair) > 1:
+            c2_layout.append([
+                sg.CB(
+                    default=True,
+                    text=d_pair[1].name,
+                    tooltip=d_pair[1].description,
+                    key=d_pair[1].name,
+                    size=(15, 1)
+                )
+            ])
     return [[sg.Column(c1_layout), sg.Column(c2_layout)]]
 
 
 def create_gamerule_layout():
-    grouped = sg.Column([[]], scrollable=True, vertical_scroll_only=True,)
+    grouped = sg.Column([[]], scrollable=True, vertical_scroll_only=True)
     for gr in gamerules.keys():
         col1, col2 = sg.Sizer(20, 1), sg.Sizer(15, 1)
         col2.ElementJustification = "right"
