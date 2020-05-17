@@ -1,5 +1,7 @@
 from datapack_creator.elements.item import Item
 
+# TODO: Add 1.16 items
+
 
 class McItems:
 

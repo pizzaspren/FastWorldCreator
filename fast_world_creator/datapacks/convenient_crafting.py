@@ -98,7 +98,7 @@ class ConvenientCraftingDataPack(Datapack):
                 "III"
             ],
             {
-                "I": Tag("minecraft:logs_that_burn").as_ingredient(),
+                "I": McItemTags.LOGS_THAT_BURN.as_ingredient(),
                 "C": McItemTags.COALS.as_ingredient()
             },
             McItems.CHARCOAL, 8
@@ -185,7 +185,7 @@ class ConvenientCraftingDataPack(Datapack):
             ],
             {
                 "D": McItems.WHITE_DYE.as_ingredient(),
-                "W": Tag("minecraft:wool").as_ingredient()
+                "W": McItemTags.WOOL.as_ingredient()
             },
             McItems.WHITE_WOOL, 8
         ))
