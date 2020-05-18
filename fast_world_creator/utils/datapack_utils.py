@@ -4,7 +4,8 @@ import zipfile
 from typing import List, Type, Union
 
 from datapack_creator.elements.datapacks.base_datapack import Datapack
-from fast_world_creator.datapacks import *
+from fast_world_creator.datapacks import RandomLootDataPack, \
+    ConvenientCraftingDataPack, MoreAdvancementsDataPack
 from fast_world_creator.datapacks.external_datapack import ExternalDatapack
 from fast_world_creator.utils import common_utils as cu
 

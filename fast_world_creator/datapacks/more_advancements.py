@@ -1,4 +1,4 @@
-from datapack_creator.elements.advancements import *
+from datapack_creator.elements.advancements import AdvancementFrame, Advancement
 from datapack_creator.elements.datapacks.base_datapack import Datapack
 from datapack_creator.elements.item import Item
 from datapack_creator.minecraft.advancements import McAdvancements

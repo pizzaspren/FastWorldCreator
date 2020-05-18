@@ -1,6 +1,6 @@
 from datapack_creator.elements.datapacks.base_datapack import Datapack
-from datapack_creator.elements.recipes import *
-from datapack_creator.elements.tag import Tag
+from datapack_creator.elements.recipes import SmokingRecipe, \
+    ShapelessCraftingRecipe, ShapedCraftingRecipe
 from datapack_creator.minecraft.items import McItems
 from datapack_creator.minecraft.tags.item_tags import McItemTags
 

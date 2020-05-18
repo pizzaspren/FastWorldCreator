@@ -27,7 +27,7 @@ def find_installed_minecraft_versions(mc_dir: str = None) -> Dict:
                 if os.path.isfile(version_jar):
                     installed_versions[str(i)] = str(version_jar)
     log(f"Found {len(installed_versions)} installed version(s)")
-    if not len(installed_versions):
+    if not installed_versions:
         log("Aborting...")
         exit(0)
     return installed_versions

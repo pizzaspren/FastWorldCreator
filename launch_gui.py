@@ -22,12 +22,8 @@ def create_window_layout():
     tab1 = sg.Tab("Main", create_main_tab_layout())
     tab2 = sg.Tab("Gamerules", create_gamerule_layout())
     layout = [
-        [
-            sg.TabGroup([[tab1, tab2]])
-        ],
-        [
-            sg.Button('Ok'), sg.Button('Cancel')
-        ]
+        [sg.TabGroup([[tab1, tab2]])],
+        [sg.Button('Ok'), sg.Button('Cancel')]
     ]
     return layout
 
@@ -144,7 +140,8 @@ def create(values: dict) -> None:
 # Create the Window
 window = sg.Window(
     title='Fast world creator',
-    layout=create_window_layout())
+    layout=create_window_layout(),
+    icon="assets/logo64.ico",)
 while True:
     event, value_dict = window.read()
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel

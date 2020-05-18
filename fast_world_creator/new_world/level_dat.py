@@ -1,6 +1,6 @@
 import random
 
-from nbtlib import *
+from nbtlib import tag, schema, nbt, parse_nbt
 
 from fast_world_creator.utils import version_mapping
 

@@ -9,7 +9,7 @@ class Tag:
 
     def __mul__(self, other):
         """To be used in shapeless crafting recipes"""
-        if type(other) == int:
+        if isinstance(other, int):
             return [self.name] * other
         return self
 
