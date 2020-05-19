@@ -1,114 +1,127 @@
-import random
+import json
 
 from nbtlib import tag, schema, nbt, parse_nbt
 
-from fast_world_creator.utils import version_mapping
+from fast_world_creator.utils.level_dat_utils import get_template_dict
 
-LevelData = schema('LevelData', {
-    'DataVersion': tag.Int,
-    'DimensionData': schema('DimensionData', {
-        '1': schema('EndData', {
-            'DragonFight': schema('DragonFight', {
-                'ExitPortalLocation': schema('ExitPortalLocation', {
-                    'X': tag.Byte,
-                    'Y': tag.Byte,
-                    'Z': tag.Byte
-                }),
-                'Gateways': tag.List[tag.Int],
-                'DragonKilled': tag.Byte,
-                'DragonUUIDLeast': tag.Long,
-                'DragonUUIDMost': tag.Long,
-                'PreviouslyKilled': tag.Byte
-            })
-        })
-    }),
-    'version': tag.Int,
-    'initialized': tag.Byte,
-    'LevelName': tag.String,
-    'generatorName': tag.String,
-    'generatorVersion': tag.Int,
-    'generatorOptions': tag.String,
-    'RandomSeed': tag.Long,
-    'MapFeatures': tag.Byte,
-    'LastPlayed': tag.Long,
-    'SizeOnDisk': tag.Long,
+xyz_dict = {
+    'X': tag.Byte,
+    'Y': tag.Byte,
+    'Z': tag.Byte
+}
+dragon_fight_dict = {
+    'ExitPortalLocation': schema('ExitPortalLocation', xyz_dict),
+    'Gateways': tag.List[tag.Int],
+    'DragonKilled': tag.Byte,
+    'DragonUUIDLeast': tag.Long,
+    'DragonUUIDMost': tag.Long,
+    'PreviouslyKilled': tag.Byte
+}
+end_data_dict = {
+    'DragonFight': schema('DragonFight', dragon_fight_dict)
+}
+dimension_data_dict = {
+    '1': schema('EndData', end_data_dict)
+}
+game_rule_dict = {
+    'announceAdvancements': tag.String,
+    'commandBlockOutput': tag.String,
+    'disableElytraMovementCheck': tag.String,
+    'disableRaids': tag.String,
+    'doDaylightCycle': tag.String,
+    'doEntityDrops': tag.String,
+    'doFireTick': tag.String,
+    'doInsomnia': tag.String,
+    'doImmediateRespawn': tag.String,
+    'doLimitedCrafting': tag.String,
+    'doMobLoot': tag.String,
+    'doMobSpawning': tag.String,
+    'doPatrolSpawning': tag.String,
+    'doTileDrops': tag.String,
+    'doTraderSpawning': tag.String,
+    'doWeatherCycle': tag.String,
+    'drowningDamage': tag.String,
+    'fallDamage': tag.String,
+    'fireDamage': tag.String,
+    'keepInventory': tag.String,
+    'logAdminCommands': tag.String,
+    'maxCommandChainLength': tag.String,
+    'maxEntityCramming': tag.String,
+    'mobGriefing': tag.String,
+    'naturalRegeneration': tag.String,
+    'randomTickSpeed': tag.String,
+    'reducedDebugInfo': tag.String,
+    'sendCommandFeedback': tag.String,
+    'showDeathMessages': tag.String,
+    'spawnRadius': tag.String,
+    'spectatorsGenerateChunks': tag.String,
+}
+version_dict = {
+    'Id': tag.Int,
+    'Name': tag.String,
+    'Snapshot': tag.Byte
+}
+datapacks_dict = {
+    'Enabled': tag.List[tag.String],
+    'Disabled': tag.List[tag.String]
+}
+level_data_dict = {
     'allowCommands': tag.Byte,
-    'hardcore': tag.Byte,
-    'GameType': tag.Int,
+    'BorderCenterX': tag.Double,
+    'BorderCenterZ': tag.Double,
+    'BorderDamagePerBlock': tag.Double,
+    'BorderSafeZone': tag.Double,
+    'BorderSize': tag.Double,
+    'BorderSizeLerpTarget': tag.Double,
+    'BorderSizeLerpTime': tag.Long,
+    'BorderWarningBlocks': tag.Double,
+    'BorderWarningTime': tag.Double,
+    'clearWeatherTime': tag.Int,
+    'DataPacks': schema('DataPacks', datapacks_dict, strict=True),
+    'DataVersion': tag.Int,
+    'DayTime': tag.Long,
     'Difficulty': tag.Byte,
     'DifficultyLocked': tag.Byte,
-    'Time': tag.Long,
-    'DayTime': tag.Long,
+    'DimensionData': schema('DimensionData', dimension_data_dict, strict=True),
+    'GameRules': tag.Compound,
+    'GameType': tag.Int,
+    'generatorName': tag.String,
+    'generatorOptions': tag.String,
+    'generatorVersion': tag.Int,
+    'hardcore': tag.Byte,
+    'initialized': tag.Byte,
+    'LastPlayed': tag.Long,
+    'LevelName': tag.String,
+    'MapFeatures': tag.Byte,
+    'Player': tag.Compound,
+    'raining': tag.Byte,
+    'rainTime': tag.Int,
+    'RandomSeed': tag.Long,
+    'SizeOnDisk': tag.Long,
     'SpawnX': tag.Int,
     'SpawnY': tag.Int,
     'SpawnZ': tag.Int,
-    'BorderCenterX': tag.Double,
-    'BorderCenterZ': tag.Double,
-    'BorderSize': tag.Double,
-    'BorderSafeZone': tag.Double,
-    'BorderWarningBlocks': tag.Double,
-    'BorderWarningTime': tag.Double,
-    'BorderSizeLerpTarget': tag.Double,
-    'BorderSizeLerpTime': tag.Long,
-    'BorderDamagePerBlock': tag.Double,
-    'raining': tag.Byte,
-    'rainTime': tag.Int,
     'thundering': tag.Byte,
     'thunderTime': tag.Int,
-    'clearWeatherTime': tag.Int,
-    'Player': tag.Compound,
-    'GameRules': schema('Gamerules', {
-        'announceAdvancements': tag.String,
-        'commandBlockOutput': tag.String,
-        'disableElytraMovementCheck': tag.String,
-        'disableRaids': tag.String,
-        'doDaylightCycle': tag.String,
-        'doEntityDrops': tag.String,
-        'doFireTick': tag.String,
-        'doInsomnia': tag.String,
-        'doImmediateRespawn': tag.String,
-        'doLimitedCrafting': tag.String,
-        'doMobLoot': tag.String,
-        'doMobSpawning': tag.String,
-        'doPatrolSpawning': tag.String,
-        'doTileDrops': tag.String,
-        'doTraderSpawning': tag.String,
-        'doWeatherCycle': tag.String,
-        'drowningDamage': tag.String,
-        'fallDamage': tag.String,
-        'fireDamage': tag.String,
-        'keepInventory': tag.String,
-        'logAdminCommands': tag.String,
-        'maxCommandChainLength': tag.String,
-        'maxEntityCramming': tag.String,
-        'mobGriefing': tag.String,
-        'naturalRegeneration': tag.String,
-        'randomTickSpeed': tag.String,
-        'reducedDebugInfo': tag.String,
-        'sendCommandFeedback': tag.String,
-        'showDeathMessages': tag.String,
-        'spawnRadius': tag.String,
-        'spectatorsGenerateChunks': tag.String,
-    }),
-    'Version': schema('Version', {
-        'Id': tag.Int,
-        'Name': tag.String,
-        'Snapshot': tag.Byte
-    }),
-    'DataPacks': schema('DataPacks', {
-        'Enabled': tag.List[tag.String],
-        'Disabled': tag.List[tag.String]
-    })
-})
+    'Time': tag.Long,
+    'version': tag.Int,
+    'Version': schema('Version', version_dict, strict=True)
+}
 
+LevelDataSchema = schema('LevelData', level_data_dict, strict=True)
 LevelFileSchema = schema('LevelFileSchema', {
     '': schema('LevelFileRoot', {
-        'Data': LevelData
+        'Data': tag.Compound
     })
 })
 
 
 class LevelFile(nbt.File, LevelFileSchema):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.gzipped = True
+
     @property
     def data(self):
         """The level data tag."""
@@ -128,93 +141,11 @@ class LevelFile(nbt.File, LevelFileSchema):
     @staticmethod
     def from_arguments(arg_dict):
         """ Builds an nbt level.dat file from a template with arguments. """
-        if arg_dict is None:
-            arg_dict = {}
-        default_seed = random.randint(0, 1000000)
-        default_data = get_level_dat_template()
-        default_args = {
-            "arg_v_id": "0",
-            "arg_version": "1.15.2",
-            "arg_world_name": f"New_World_{default_seed}",
-            "arg_seed": str(default_seed),
-            "arg_hardcore": "0",
-            "arg_diff": "2"
-        }
-        default_args.update(arg_dict)
-        version_id = version_mapping.map[default_args["arg_version"]]
-        default_args["arg_v_id"] = version_id
-        default_args["arg_seed"] = str(int(default_seed))
-        for key, val in default_args.items():
-            default_data = default_data.replace(key, val)
-        nbt_data = parse_nbt(default_data)
-        return LevelFile(nbt_data, gzipped=True)
+        default_data = get_template_dict()
+        default_data.update(arg_dict)
+        # Why Mojang?
+        default_data["DataVersion"] = default_data["Version"]["Id"]
 
-
-def get_level_dat_template():
-    """ Gets the minimum template values for a level.dat file. """
-    return """
-    {"": {
-        Data: {
-            DataVersion: arg_v_id,
-            version: 19133,
-            initialized: 0b,
-            LevelName: arg_world_name,
-            generatorName: "default",
-            generatorVersion: 1,
-            RandomSeed: arg_seedL,
-            allowCommands: 1b,
-            Version: {
-                Snapshot: 0b,
-                Id: arg_v_id,
-                Name: arg_version
-            },
-            DataPacks: {
-                Enabled: [datapack_list]
-            },
-            hardcore: arg_hardcoreb,
-            Difficulty: arg_diffb,
-            GameRules: arg_gamerules
-        }
-    }}
-    """
-
-
-def get_default_gamerules():
-    return {
-        'announceAdvancements': True,
-        'commandBlockOutput': True,
-        'disableElytraMovementCheck': False,
-        'disableRaids': False,
-        'doDaylightCycle': True,
-        'doEntityDrops': True,
-        'doFireTick': True,
-        'doInsomnia': True,
-        'doImmediateRespawn': False,
-        'doLimitedCrafting': False,
-        'doMobLoot': True,
-        'doMobSpawning': True,
-        'doPatrolSpawning': True,
-        'doTileDrops': True,
-        'doTraderSpawning': True,
-        'doWeatherCycle': True,
-        'drowningDamage': True,
-        'fallDamage': True,
-        'fireDamage': True,
-        'keepInventory': False,
-        'logAdminCommands': True,
-        'maxCommandChainLength': 65536,
-        'maxEntityCramming': 24,
-        'mobGriefing': True,
-        'naturalRegeneration': True,
-        'randomTickSpeed': 3,
-        'reducedDebugInfo': False,
-        'sendCommandFeedback': True,
-        'showDeathMessages': True,
-        'spawnRadius': 10,
-        'spectatorsGenerateChunks': True,
-    }
-
-
-if __name__ == "__main__":
-    lf = LevelFile.from_arguments(None)
-    print(lf)
+        level_file = LevelFile(parse_nbt("{'':{Data:{}}}"))
+        level_file.data = LevelDataSchema(parse_nbt(json.dumps(default_data)))
+        return level_file

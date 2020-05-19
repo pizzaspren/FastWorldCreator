@@ -240,8 +240,8 @@ class MoreAdvancementsDataPack(Datapack):
             criteria={
                 "plant_chorus": {
                     "trigger": "minecraft:placed_block",
-                    "block": {
-                        "item": "minecraft:chorus_flower"
+                    "conditions": {
+                        "block": "minecraft:chorus_flower"
                     }
                 }
             }

@@ -1,7 +1,7 @@
 import PySimpleGUI as sg
 
 from fast_world_creator import core
-from fast_world_creator.new_world.level_dat import get_default_gamerules
+from fast_world_creator.utils.level_dat_utils import get_default_gamerules
 from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu, \
     datapack_utils
 
@@ -35,18 +35,20 @@ def create_main_tab_layout():
             [k for k in installed_versions.keys()],
             default_value=list(installed_versions.keys())[-1],
             size=(18, 1),
-            readonly=True
+            readonly=True,
+            key="release"
         )
     ]]
     layout += [[
         sg.T('World Name', size=(10, 1)),
-        sg.I(size=(20, 1))
+        sg.I(size=(20, 1), key="name")
     ]]
     layout += [[
         sg.T('Seed', size=(10, 1), tooltip="Leave blank for random seed"),
         sg.I(
             size=(20, 1),
             tooltip="Leave blank for random seed",
+            key="seed"
         )
     ]]
     layout += [[
@@ -56,6 +58,7 @@ def create_main_tab_layout():
             default_value=difficulties[0],
             size=(18, 1),
             readonly=True,
+            key="difficulty"
         )
     ]]
     layout += [[sg.Frame(title='Datapacks', layout=create_datapack_layout())]]
@@ -123,15 +126,18 @@ def create_gamerule_layout():
 
 
 def create(values: dict) -> None:
-    sent_values = list(values.values())
     updated_gamerules = dict()
     for gr in gamerules:
+        # Gamerules always stored as strings
         updated_gamerules[gr] = str(values.get(gr)).lower()
     core.run(
-        version_pair=(sent_values[0], installed_versions[sent_values[0]]),
-        world_name=sent_values[1],
-        seed=sent_values[2],
-        difficulty=difficulties.index(sent_values[3]),
+        version_pair=(
+            values.get("release"),
+            installed_versions[values.get("release")]
+        ),
+        world_name=values.get("name"),
+        seed=values.get("seed"),
+        difficulty=difficulties.index(values.get("difficulty")),
         datapacks=[dp for dp in available_datapacks if values[dp.name]],
         gamerules=updated_gamerules
     )

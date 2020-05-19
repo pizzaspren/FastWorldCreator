@@ -10,3 +10,10 @@ class Difficulties(enum.IntEnum):
 
     def is_hardcore(self):
         return self is self.HARDCORE
+
+
+class GameModes(enum.IntEnum):
+    SURVIVAL = 0
+    CREATIVE = 1
+    ADVENTURE = 2
+    SPECTATOR = 3

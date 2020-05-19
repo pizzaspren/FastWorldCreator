@@ -20,7 +20,7 @@ def find_installed_minecraft_versions(mc_dir: str = None) -> Dict:
 
     installed_versions = dict()
     for i in installations:
-        if i in version_mapping.map.keys():
+        if i in version_mapping.version_map.keys():
             version_folder = os.sep.join([installations_folder, i])
             if os.path.isdir(version_folder):
                 version_jar = os.sep.join([version_folder, i]) + ".jar"
