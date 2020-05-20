@@ -7,8 +7,8 @@
 
 Generate Minecraft worlds with your favourite datapacks in a couple clicks!
 
-<details>
-  <summary>GUI images</summary>
+<details open>
+  <summary>GUI images (Collapsable)</summary>
   
   <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_main.png" width="400">
   <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_gamerules.png" width="400">
