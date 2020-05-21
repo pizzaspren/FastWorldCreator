@@ -15,14 +15,16 @@ installed_versions = cu.find_installed_minecraft_versions()
 available_datapacks = datapack_utils.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
 difficulties = [d.name.title() for d in mu.Difficulties]
+game_modes = [g.name.title() for g in mu.GameModes]
 gamerules = get_default_gamerules()
 
 
 def create_window_layout():
     tab1 = sg.Tab("Main", create_main_tab_layout())
     tab2 = sg.Tab("Gamerules", create_gamerule_layout())
+    tab3 = sg.Tab("World gen", create_worldgen_layout())
     layout = [
-        [sg.TabGroup([[tab1, tab2]])],
+        [sg.TabGroup([[tab1, tab2, tab3]])],
         [sg.Button('Ok'), sg.Button('Cancel')]
     ]
     return layout
@@ -59,6 +61,16 @@ def create_main_tab_layout():
             size=(18, 1),
             readonly=True,
             key="difficulty"
+        )
+    ]]
+    layout += [[
+        sg.T('Game mode', size=(10, 1)),
+        sg.Combo(
+            game_modes,
+            default_value=game_modes[0],
+            size=(18, 1),
+            readonly=True,
+            key="game_mode"
         )
     ]]
     layout += [[sg.Frame(title='Datapacks', layout=create_datapack_layout())]]
@@ -125,6 +137,16 @@ def create_gamerule_layout():
     return [[grouped]]
 
 
+def create_worldgen_layout():
+    weather_layout = []
+    weather_layout += [
+        sg.CB(text="Raining", key="rain"),
+        sg.CB(text="Thundering", key="thunder"),
+    ]
+    layout = [[sg.Frame(title='Weather', layout=[weather_layout])]]
+    return layout
+
+
 def create(values: dict) -> None:
     updated_gamerules = dict()
     for gr in gamerules:
@@ -139,7 +161,10 @@ def create(values: dict) -> None:
         seed=values.get("seed"),
         difficulty=difficulties.index(values.get("difficulty")),
         datapacks=[dp for dp in available_datapacks if values[dp.name]],
-        gamerules=updated_gamerules
+        gamerules=updated_gamerules,
+        game_mode=game_modes.index(values.get("game_mode")),
+        raining=values.get("rain"),
+        thundering=values.get("thunder")
     )
 
 

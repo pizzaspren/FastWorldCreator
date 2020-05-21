@@ -39,7 +39,9 @@ class WorldCreator:
         os.mkdir(os.sep.join([self.w_dir, "datapacks"]))
 
     def create_level_dat(self, gamerules: dict, difficulty: int,
-                         datapack_list: List[str]) -> None:
+                         datapack_list: List[str], game_mode: int = 0,
+                         raining: bool = False,
+                         thundering: bool = False) -> None:
         """ Creates the level.dat NBT file in the new world folder. """
         from fast_world_creator.new_world.level_dat import LevelFile
         world_level_dat = os.sep.join([self.w_dir, "level.dat"])
@@ -56,7 +58,9 @@ class WorldCreator:
             },
             "Difficulty": min(difficulty, 3),
             "hardcore": int(mu.Difficulties(difficulty).is_hardcore()),
-            "GameRules": gamerules
+            "GameRules": gamerules,
+            "GameType": game_mode,
+            "raining": raining,
+            "thundering": thundering
         })
-        print(level_file.values())
         level_file.save(filename=world_level_dat)

@@ -26,6 +26,8 @@ Look no further, this application is just what you need!
 * Select which datapacks you want to add to your world with a simple click.
 * ...And much more!
 
+*Functionality verified with 1.14.4 and 1.15.2, but should support full releases (not snapshots (yet)) from 1.13 onwards.*
+
 ### Requirements
 This is what you will need in order to launch the application via code. You can find the executable versions in the [releases](https://github.com/pizzaspren/FastWorldCreator/releases) page
 * Python 3.7+

@@ -4,8 +4,7 @@ import zipfile
 from typing import List, Type, Union
 
 from datapack_creator.elements.datapacks.base_datapack import Datapack
-from fast_world_creator.datapacks import RandomLootDataPack, \
-    ConvenientCraftingDataPack, MoreAdvancementsDataPack
+from fast_world_creator.datapacks import RandomLootDataPack
 from fast_world_creator.datapacks.external_datapack import ExternalDatapack
 from fast_world_creator.utils import common_utils as cu
 
@@ -36,9 +35,7 @@ def delete_loot_tables() -> None:
 
 def get_available_datapacks() -> List[Union[str, Type[Datapack]]]:
     datapacks = [
-        RandomLootDataPack,
-        ConvenientCraftingDataPack,
-        MoreAdvancementsDataPack
+        RandomLootDataPack
     ]
     external_datapack_folder = f"{os.getcwd()}/assets/imported_datapacks"
     for z in os.listdir(external_datapack_folder):
