@@ -10,8 +10,9 @@ Generate Minecraft worlds with your favourite datapacks in a couple clicks!
 <details open>
   <summary>GUI images (Collapsable)</summary>
   
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_main.png" width="400">
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_gamerules.png" width="400">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_main.png" width="275">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_gamerules.png" width="275">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_worldgen.png" width="275">
 </details>
 
 Tired of copying and pasting your datapacks every time you create a new world? Want to create a multitude of worlds in a very short time? Would you like to create worlds for different versions of Minecraft without even launching the game?
@@ -20,8 +21,8 @@ Look no further, this application is just what you need!
 
 ### Features
 * Automatically detect installed Minecraft releases.
-* Highly customizable world generation.
-* Bundled with vanilla-style datapacks to enhance your gameplay.
+* Highly customizable world generation (soon).
+* Bundled with an optional loot randomizing datapack that works for ANY version.
 * Drop your own datapacks in the `assets/imported_datapacks` folder and they will become instantly available to all the new worlds you want to create.
 * Select which datapacks you want to add to your world with a simple click.
 * ...And much more!
