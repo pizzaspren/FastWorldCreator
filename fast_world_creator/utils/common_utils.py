@@ -15,15 +15,15 @@ def find_installed_minecraft_versions(mc_dir: str = None) -> Dict:
     log("Looking for installed minecraft versions")
     if not mc_dir:
         mc_dir = get_mc_folder()
-    installations_folder = os.sep.join([mc_dir, "versions"])
+    installations_folder = f"{mc_dir}/versions"
     installations = os.listdir(installations_folder)
 
     installed_versions = dict()
     for i in installations:
         if i in version_mapping.version_map.keys():
-            version_folder = os.sep.join([installations_folder, i])
+            version_folder = f"{installations_folder}/{i}"
             if os.path.isdir(version_folder):
-                version_jar = os.sep.join([version_folder, i]) + ".jar"
+                version_jar = f"{version_folder}/{i}.jar"
                 if os.path.isfile(version_jar):
                     installed_versions[str(i)] = str(version_jar)
     log(f"Found {len(installed_versions)} installed version(s)")
@@ -35,7 +35,7 @@ def find_installed_minecraft_versions(mc_dir: str = None) -> Dict:
 
 def get_mc_folder():
     if not get_mc_folder.loaded:
-        get_mc_folder.loaded = os.sep.join([os.getenv("APPDATA"), ".minecraft"])
+        get_mc_folder.loaded = f"{os.getenv('APPDATA')}/.minecraft"
     return get_mc_folder.loaded
 
 

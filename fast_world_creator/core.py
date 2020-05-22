@@ -1,7 +1,7 @@
 import random
 
 from fast_world_creator.new_world import world_creator
-from fast_world_creator.utils import common_utils as cu, datapack_utils as du
+from fast_world_creator.utils import common_utils as cu
 
 
 def run(version_pair, world_name, seed, datapacks, gamerules,
@@ -12,15 +12,10 @@ def run(version_pair, world_name, seed, datapacks, gamerules,
         seed=seed
     )
     owd = cu.change_directory(wc.create_world_directory())
-    wc.create_datapack_directory()
     if datapacks:
-        if any([d.needs_loot_tables() for d in datapacks]):
-            du.extract_loot_tables(version_pair[1])
+        wc.create_datapack_directory()
         for d in datapacks:
-            creation_ok = d().create_datapack_files(seed=seed)
-            if not creation_ok:
-                print(f"Failed creation of datapack {d}")
-        du.delete_loot_tables()
+            d().create_datapack_files(seed=wc.seed, jar_path=version_pair[1])
     else:
         datapacks = ""
     wc.create_level_dat(

@@ -6,6 +6,7 @@ from typing import List
 from fast_world_creator.utils import common_utils as cu
 from fast_world_creator.utils import minecraft_utils as mu
 from fast_world_creator.utils.version_mapping import version_map
+from fast_world_creator.new_world.level_dat import LevelFile
 
 
 class WorldCreator:
@@ -43,7 +44,6 @@ class WorldCreator:
                          raining: bool = False,
                          thundering: bool = False) -> None:
         """ Creates the level.dat NBT file in the new world folder. """
-        from fast_world_creator.new_world.level_dat import LevelFile
         world_level_dat = os.sep.join([self.w_dir, "level.dat"])
         level_file = LevelFile.from_arguments({
             "Version": {

@@ -1,9 +1,10 @@
 import PySimpleGUI as sg
 
 from fast_world_creator import core
+from fast_world_creator.utils import common_utils as cu
+from fast_world_creator.utils import datapack_utils as du
+from fast_world_creator.utils import minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
-from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu, \
-    datapack_utils
 
 sg.theme('DarkAmber')  # Add a touch of color
 sg.SetOptions(
@@ -12,7 +13,7 @@ sg.SetOptions(
 )
 
 installed_versions = cu.find_installed_minecraft_versions()
-available_datapacks = datapack_utils.get_available_datapacks()
+available_datapacks = du.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
 difficulties = [d.name.title() for d in mu.Difficulties]
 game_modes = [g.name.title() for g in mu.GameModes]
@@ -86,21 +87,21 @@ def create_datapack_layout():
     for d_pair in grouped_packs:
         c1_layout.append([
             sg.CB(
-                default=True,
+                default=d_pair[0].default_enabled,
                 text=d_pair[0].name,
                 tooltip=d_pair[0].description,
                 key=d_pair[0].name,
-                size=(15, 1)
+                size=(20, 1)
             )
         ])
         if len(d_pair) > 1:
             c2_layout.append([
                 sg.CB(
-                    default=True,
+                    default=d_pair[1].default_enabled,
                     text=d_pair[1].name,
                     tooltip=d_pair[1].description,
                     key=d_pair[1].name,
-                    size=(15, 1)
+                    size=(20, 1)
                 )
             ])
     return [[sg.Column(c1_layout), sg.Column(c2_layout)]]
@@ -172,7 +173,7 @@ def create(values: dict) -> None:
 window = sg.Window(
     title='Fast world creator',
     layout=create_window_layout(),
-    icon="assets/logo64.ico",)
+    icon="assets/logo64.ico", )
 while True:
     event, value_dict = window.read()
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel
