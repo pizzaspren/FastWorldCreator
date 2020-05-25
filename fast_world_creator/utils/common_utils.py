@@ -1,5 +1,4 @@
 import os
-import sys
 from typing import Dict
 
 from fast_world_creator.utils import version_mapping
@@ -56,12 +55,3 @@ def change_directory(to_dir: str) -> str:
     owd = os.getcwd()
     os.chdir(to_dir)
     return owd
-
-
-def parse_cmd_arguments() -> Dict:
-    """ Parse the command line arguments and store them into a dictionary. """
-    arg_dict = {}
-    for arg in sys.argv[1:]:
-        arg_k, arg_v = arg.split("=")
-        arg_dict[f"arg_{arg_k}"] = arg_v
-    return arg_dict

@@ -65,6 +65,27 @@ datapacks_dict = {
     'Enabled': tag.List[tag.String],
     'Disabled': tag.List[tag.String]
 }
+generator_options_dict = {
+    'biome_source': schema("biome_sources", {
+        'options': schema("biome_source_options", {
+            'biomes': tag.List[tag.String],
+            'size': tag.Byte
+        }),
+        'type': tag.String
+    }),
+    'chunk_generator': schema("chunk_generator", {
+        'options': schema("chunk_generator_options", {
+            'default_block': tag.String,
+            'default_fluid': tag.String
+        }),
+        'type': tag.String
+    }),
+    'structures': tag.Compound,
+    'layers': tag.List[schema('layers', {
+        'block': tag.String,
+        'height': tag.String
+    })]
+}
 level_data_dict = {
     'allowCommands': tag.Byte,
     'BorderCenterX': tag.Double,
@@ -86,7 +107,7 @@ level_data_dict = {
     'GameRules': tag.Compound,
     'GameType': tag.Int,
     'generatorName': tag.String,
-    'generatorOptions': tag.String,
+    'generatorOptions': schema('generatorOptions', generator_options_dict, strict=True),
     'generatorVersion': tag.Int,
     'hardcore': tag.Byte,
     'initialized': tag.Byte,

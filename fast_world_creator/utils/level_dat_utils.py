@@ -22,7 +22,7 @@ def get_template_dict():
         'GameType': 0,
         'GameRules': {},  # Always gets overwritten by rules from UI
         'generatorName': "default",
-        # 'generatorOptions': 0,  # TODO
+        # generatorOptions only present in Buffet and Superflat generators
         'generatorVersion': 0,
         'hardcore': 0,
         'initialized': 0,

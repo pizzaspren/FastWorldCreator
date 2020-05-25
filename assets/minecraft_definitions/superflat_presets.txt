@@ -1,0 +1,9 @@
+Classic Flat;bedrock,2*dirt,grass_block;plains;village
+Tunnelers' Dream;bedrock,230*stone,5*dirt,grass_block;mountains;biome_1,decoration,stronghold,mineshaft,dungeon
+Water World;bedrock,5*stone,5*dirt,5*sand,90*water;deep_ocean;oceanmonument,biome_1
+Overworld;bedrock,59*stone,3*dirt,grass_block;plains;pillager_outpost,village,biome_1,decoration,stronghold,mineshaft,lake,lava_lake,dungeon
+Snowy Kingdom;bedrock,59*stone,3*dirt,grass_block,snow;snowy_tundra;village,biome_1
+Bottomless Pit;2*cobblestone,3*dirt,grass_block;plains;village,biome_1
+Desert;bedrock,3*stone,52*sandstone,8*sand;desert;village,biome_1,decoration,stronghold,mineshaft,dungeon
+Redstone Ready;bedrock,3*stone,52*sandstone;desert;
+The Void;air;the_void;decoration

@@ -42,10 +42,12 @@ class WorldCreator:
     def create_level_dat(self, gamerules: dict, difficulty: int,
                          datapack_list: List[str], game_mode: int = 0,
                          raining: bool = False,
-                         thundering: bool = False) -> None:
+                         thundering: bool = False, generator: str = "default",
+                         generator_opts: dict = None) -> None:
         """ Creates the level.dat NBT file in the new world folder. """
         world_level_dat = os.sep.join([self.w_dir, "level.dat"])
-        level_file = LevelFile.from_arguments({
+        mc = "minecraft:"
+        level_dat_dict = {
             "Version": {
                 "Id": version_map.get(self.mc_release),
                 "Name": self.mc_release
@@ -58,9 +60,44 @@ class WorldCreator:
             },
             "Difficulty": min(difficulty, 3),
             "hardcore": int(mu.Difficulties(difficulty).is_hardcore()),
+            "generatorName": generator,
             "GameRules": gamerules,
             "GameType": game_mode,
             "raining": raining,
             "thundering": thundering
-        })
+        }
+        if mu.GeneratorNames(generator) == mu.GeneratorNames.BUFFET:
+            generator_options_dict = {
+                "biome_source": {
+                    "type": mc + generator_opts.get("buffet_biome_type"),
+                    "options": {
+                        "size": generator_opts.get('buffet_size'),
+                        "biomes": [mc+biome for biome in
+                                   generator_opts.get("buffet_biomes")]
+                    }
+                },
+                "chunk_generator": {
+                    "options": {
+                        "default_block": mc+generator_opts.get("buffet_block"),
+                        "default_fluid": mc+generator_opts.get("buffet_fluid")
+                    },
+                    "type": mc+generator_opts.get("buffet_chunk_type")
+                }
+            }
+            level_dat_dict["generatorOptions"] = generator_options_dict
+        elif mu.GeneratorNames(generator) == mu.GeneratorNames.FLAT:
+            generator_layers = []
+            for layer in generator_opts.get("flat_layers"):
+                generator_layers.append({
+                    "block": mc+layer[1],
+                    "height": str(layer[0])
+                })
+            generator_options_dict = {
+                "biome": mc+generator_opts.get("flat_biome"),
+                "layers": generator_layers,
+                "structures": generator_opts.get("flat_structures")
+            }
+            level_dat_dict["generatorOptions"] = generator_options_dict
+
+        level_file = LevelFile.from_arguments(level_dat_dict)
         level_file.save(filename=world_level_dat)
