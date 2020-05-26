@@ -607,7 +607,6 @@ wall_banner
 wall_torch
 water
 wet_sponge
-wheat
 white_carpet
 white_concrete
 white_concrete_powder
