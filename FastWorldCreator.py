@@ -39,7 +39,7 @@ gamerules = get_default_gamerules()
 
 def create_layouts():
     def create_main_tab_layout():
-        layout = [[
+        c1_layout = [[
             sg.T('MC Version', size=(10, 1)),
             sg.Combo(
                 [k for k in installed_versions.keys()],
@@ -48,28 +48,40 @@ def create_layouts():
                 readonly=True,
                 key="release")
         ]]
-        layout += [[
+        c1_layout += [[
             sg.T('World Name', size=(10, 1)),
             sg.I(size=(20, 1), key="name")
         ]]
-        layout += [[
+        c1_layout += [[
             sg.T('Seed', size=(10, 1), tooltip="Leave blank for random seed"),
             sg.I(size=(20, 1), tooltip="Leave blank for random seed",
                  key="seed")
         ]]
-        layout += [[
+        c1_layout += [[
             sg.T('Difficulty', size=(10, 1)),
             sg.Combo(difficulties, difficulties[0], (18, 1), readonly=True,
                      key="difficulty")
         ]]
-        layout += [[
+        c1_layout += [[
             sg.T('Game mode', size=(10, 1)),
             sg.Combo(game_modes, game_modes[0], (18, 1), readonly=True,
                      key="game_mode")
         ]]
+        c2_layout = [[sg.Frame('Weather', create_weather_layout())]]
+        layout = [[
+            sg.Col(c1_layout, pad=(5, 7)), sg.Col(c2_layout, pad=(0, 17))
+        ]]
         layout += [[
             sg.Frame('Datapacks', create_datapack_layout(), size=(50, 1))
         ]]
+        return layout
+
+    def create_weather_layout():
+        layout = [
+            [sg.Radio("Clear", "weather", True)],
+            [sg.Radio("Rain", "weather", key="rain")],
+            [sg.CB("Thunder", key="thundering")]
+        ]
         return layout
 
     def create_datapack_layout():
@@ -100,21 +112,13 @@ def create_layouts():
             grouped.add_row(col1, col2)
         return [[grouped]]
 
-    def create_worldgen_layout():
-        weather_layout = [[
-            sg.CB("Raining", key="rain"), sg.CB("Thundering", key="thunder")
-        ]]
-        layout = [[sg.Frame('Weather', weather_layout)]]
-        layout += [[sg.Frame('Generator', create_generator_layout())]]
-        return layout
-
-    def create_generator_layout():
+    def create_terrain_layout():
         layout = []
         layout += [[
-            sg.T("World type", (16, 1)),
+            sg.T("World type", (16, 1), pad=(10, 10)),
             sg.Combo(generators, mu.GeneratorNames.DEFAULT.value.title(),
-                     (25, 1),
-                     readonly=True, enable_events=True, key="generator")
+                     (25, 1), pad=(3, 10), readonly=True, enable_events=True,
+                     key="generator")
         ]]
         layout += [[sg.Frame('Buffet options', create_buffet_options(),
                              key='buffet_option_frame')]]
@@ -123,8 +127,7 @@ def create_layouts():
         return layout
 
     def create_buffet_options():
-        layout = []
-        layout += [[
+        layout = [[
             sg.T("Chunk generator", (15, 1)),
             sg.Combo(chunk_generator_types, chunk_generator_types[0],
                      (25, 1), readonly=True, enable_events=True,
@@ -155,7 +158,7 @@ def create_layouts():
         layout += [[
             sg.T("Biomes", (15, 1)),
             sg.Col([[sg.CB(b, key=f"buffet_biome_{b}")] for b in biomes],
-                   size=(175, 100), pad=(5, 5), scrollable=True,
+                   size=(175, 125), pad=(5, 5), scrollable=True,
                    vertical_scroll_only=True, key="buffet_biomes")
         ]]
         return layout
@@ -185,7 +188,7 @@ def create_layouts():
 
     tab1 = sg.Tab("Main", create_main_tab_layout())
     tab2 = sg.Tab("Gamerules", create_gamerule_layout())
-    tab3 = sg.Tab("World gen", create_worldgen_layout())
+    tab3 = sg.Tab("Terrain", create_terrain_layout())
     main_layout = [
         [sg.TabGroup([[tab1, tab2, tab3]])],
         [sg.Button('Ok'), sg.Button('Cancel')]
@@ -228,7 +231,7 @@ def create(values: dict) -> None:
             values.get("release"),
             installed_versions[values.get("release")]
         ),
-        world_name=values.get("name"),
+        world_name=values.get("name").replace(" ", "_"),
         seed=values.get("seed"),
         difficulty=difficulties.index(values.get("difficulty")),
         datapacks=[dp for dp in available_datapacks if values[dp.name]],

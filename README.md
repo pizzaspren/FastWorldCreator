@@ -13,7 +13,7 @@ Generate Minecraft worlds with your favourite datapacks in a couple clicks!
   
   <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_main.png" width="275">
   <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_gamerules.png" width="275">
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_worldgen.png" width="275">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/assets/images/gui_terrain.png" width="275">
 </details>
 
 Tired of copying and pasting your datapacks every time you create a new world? Want to create a multitude of worlds in a very short time? Would you like to create worlds for different versions of Minecraft without even launching the game?
@@ -33,7 +33,8 @@ Look no further, this application is just what you need!
 ### Requirements
 Check out the [releases](https://github.com/pizzaspren/FastWorldCreator/releases) page for the executable versions.
 
-If you want to run the application via code, this is what you will need:
+If you want to run the application via code, you will need to run
+`pip -r requirements.txt`. Otherwise, you can install these items manually.
 * Python 3.7+
     * [PySimpleGUI](https://pypi.org/project/PySimpleGUI/) 4.19.0+
     * [nbtlib](https://pypi.org/project/nbtlib/) 1.6.5+
