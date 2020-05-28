@@ -12,8 +12,6 @@ class ExternalDatapack(Datapack):
         self.path = path
         self.description = "Found in assets/imported_datapacks"
 
-    def create_datapack_files(self, *args, **kwargs):
-        return self.store()
-
-    def store(self):
+    def store(self) -> None:
+        """ Copy the existing datapack zip to the datapacks folder."""
         shutil.copy(self.path, f"{os.getcwd()}/datapacks/")

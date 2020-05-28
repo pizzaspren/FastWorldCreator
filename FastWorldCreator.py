@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import List, Type
+
 import PySimpleGUI as sg
 
 from fast_world_creator import core
@@ -13,7 +16,12 @@ sg.SetOptions(
 )
 
 
-def enum_to_cb_contents(cls):
+def enum_to_cb_contents(cls: Type[Enum]) -> List[str]:
+    """ Extract enum.Enum names into a list, formatted as titles.
+
+    :param cls: The Enum class to extract
+    :return: The extracted names for the members of the enum
+    """
     return [e.name.title() for e in cls]
 
 
@@ -38,7 +46,15 @@ gamerules = get_default_gamerules()
 
 
 def create_layouts():
+    """Create all the layouts for the GUI window."""
+
     def create_main_tab_layout():
+        """Create layout for the main tab.
+
+        Contains most common Minecraft options such as version, world name,
+        seed, game mode and difficulty. Datapack selection is bundled in the
+        main tab, and populated from the assets/imported_datapacks folder.
+        """
         c1_layout = [[
             sg.T('MC Version', size=(10, 1)),
             sg.Combo(
@@ -77,14 +93,24 @@ def create_layouts():
         return layout
 
     def create_weather_layout():
+        """Create layout for the weather frame.
+
+        Contains selection for rain/clear/thundering weather.
+        """
         layout = [
             [sg.Radio("Clear", "weather", True)],
             [sg.Radio("Rain", "weather", key="rain")],
-            [sg.CB("Thunder", key="thundering")]
+            [sg.Radio("Thunder", "weather", key="thundering")]
         ]
         return layout
 
     def create_datapack_layout():
+        """Create layout for the datapack frame.
+
+        Groups all the available datapacks in two columns. Each datapack can be
+        selected with a Checkbox, which has a default state equal to the
+        datapack's 'default_enabled' field.
+        """
         grouped_packs = [
             available_datapacks[i:i + 2] for i in
             range(0, len(available_datapacks), 2)
@@ -98,6 +124,12 @@ def create_layouts():
         return [[c1_layout, c2_layout]]
 
     def create_gamerule_layout():
+        """Create layout for the gamerules tab.
+
+        Contains all the gamerules available for the game, grouped into a single
+        column. The gamerules with a boolean value are assigned a CheckBox, and
+        the gamerules with an integer value are assigned an Input element
+        """
         grouped = sg.Column([[]], scrollable=True, vertical_scroll_only=True)
         for gr in gamerules.keys():
             col1, col2 = sg.Sizer(20, 1), sg.Sizer(15, 1)
@@ -113,6 +145,11 @@ def create_layouts():
         return [[grouped]]
 
     def create_terrain_layout():
+        """Create layout for the terrain tab.
+
+        Contains all the options for the different terrain generators available
+        in the game (1.13 until pre-20w21a).
+        """
         layout = []
         layout += [[
             sg.T("World type", (16, 1), pad=(10, 10)),
@@ -127,6 +164,13 @@ def create_layouts():
         return layout
 
     def create_buffet_options():
+        """Create layout for the buffet frame.
+
+        Being the most complex generator in the game, the buffet terrain
+        generator offers a lot of customization options. The data is pulled from
+        the assets folder and put into fields that can be easily differentiated
+        by the users.
+        """
         layout = [[
             sg.T("Chunk generator", (15, 1)),
             sg.Combo(chunk_generator_types, chunk_generator_types[0],
@@ -164,6 +208,11 @@ def create_layouts():
         return layout
 
     def create_superflat_options():
+        """Create layout for the superflat frame.
+
+        The data is pulled from the assets folder and put into fields that can
+        be easily differentiated by the users.
+        """
         layout = []
         layout += [[
             sg.T("Presets", (15, 1)),
@@ -196,7 +245,10 @@ def create_layouts():
     return main_layout
 
 
-def parse_generator_options(values):
+def parse_generator_options(values: dict) -> dict:
+    """ Extract terrain generator options into a semi-parsed dictionary.
+
+    :param values: The values generated from the PySimpleGUI window event."""
     def parse_flat_layers():
         layers = []
         for layer in values.get("flat_layers").split(","):
@@ -222,6 +274,9 @@ def parse_generator_options(values):
 
 
 def create(values: dict) -> None:
+    """ Start the creation of the Minecraft world.
+
+    :param values: The values generated from the PySimpleGUI window event."""
     updated_gamerules = dict()
     for gr in gamerules:
         # Gamerules always stored as strings

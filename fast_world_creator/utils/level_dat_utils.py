@@ -1,4 +1,8 @@
-def get_template_dict():
+def get_template_dict() -> dict:
+    """ Get a template for the level.dat nbt structure.
+
+    :return: A template for level.dat.
+    """
     return {
         'allowCommands': 1,
         'BorderCenterX': 0,
@@ -45,7 +49,15 @@ def get_template_dict():
     }
 
 
-def get_default_gamerules():
+def get_default_gamerules() -> dict:
+    """ Get a dictionary containing each game rule and its default value.
+
+    Game rules that are not present in a Minecraft version are ignored by the
+    client so it is safe to use all the game rules regardless of the version.
+    Default values found in https://minecraft.gamepedia.com/Commands/gamerule.
+    :return: All the gamerules ever parsed in any Minecraft version between 1.13
+        and 1.15.2
+    """
     return {
         'announceAdvancements': True,
         'commandBlockOutput': True,

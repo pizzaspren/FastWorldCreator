@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 
 from nbtlib import tag, schema, nbt, parse_nbt
@@ -144,24 +145,25 @@ class LevelFile(nbt.File, LevelFileSchema):
         self.gzipped = True
 
     @property
-    def data(self):
+    def data(self) -> schema:
         """The level data tag."""
         return self.root['Data']
 
     @data.setter
-    def data(self, value):
+    def data(self, value: schema) -> None:
         self.root['Data'] = value
 
     @classmethod
-    def load(cls, filename, **kwargs):
+    def load(cls, filename: str, **kwargs) -> nbt.File:
         return super().load(filename, True)
 
-    def __enter__(self):
-        return self.data
-
     @staticmethod
-    def from_arguments(arg_dict):
-        """ Builds an nbt level.dat file from a template with arguments. """
+    def from_arguments(arg_dict: dict) -> LevelFile:
+        """  Builds an nbt level.dat file from a template with arguments.
+
+        :param arg_dict: The dictionary containing the values for a data schema.
+        :return: The created nbt file object.
+        """
         default_data = get_template_dict()
         default_data.update(arg_dict)
         # Why Mojang?
