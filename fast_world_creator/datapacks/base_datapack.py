@@ -14,8 +14,6 @@ class Datapack:
 
     def _create_datapack_files(self, *args, **kwargs) -> None:
         """ Abstract method to create the necessary datapack files. """
-        pass
 
     def store(self) -> None:
         """ Abstract method to store the datapack as a zip file. """
-        pass
