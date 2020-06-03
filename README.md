@@ -21,9 +21,8 @@ Tired of copying and pasting your datapacks every time you create a new world? W
 Look no further, this application is just what you need!
 
 ### Features
-* Automatically detect installed Minecraft releases.
 * Highly customizable world generation.
-* Bundled with an optional loot randomizing datapack that works for ANY version.
+* Bundled with an optional loot randomizing datapack that works for ANY installed version.
 * Drop your own datapacks in the `assets/imported_datapacks` folder and they will become instantly available to all the new worlds you want to create.
 * Select which datapacks you want to add to your world with a simple click.
 * ...And much more!

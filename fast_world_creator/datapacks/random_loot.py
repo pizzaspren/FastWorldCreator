@@ -17,13 +17,13 @@ class RandomLootDataPack(Datapack):
         self.description = "Loot table randomizer"
         self.default_enabled = False
 
-    def _create_datapack_files(self, jar_path: str, seed: int = None, *args,
-                               **kwargs) -> None:
+    def _create_datapack_files(self, version: str, seed: int = None, *args,
+                               **kwargs) -> bool:
         """ Create the necessary datapack files.
 
-        :param jar_path: The path to the Minecraft jar to extract the loot
-            tables from.
+        :param version: The version of Minecraft to use as base (e.g. '1.15.2').
         :param seed: The seed to use for the randomization of the loot tables.
+        :return: True if the files were created successfully.
         """
         self.datapack_files.append({
             "path": 'pack.mcmeta',
@@ -37,17 +37,24 @@ class RandomLootDataPack(Datapack):
                 indent=4
             )
         })
-        self._extract_loot_tables(jar_path)
+        if not self._extract_loot_tables(version):
+            cu.log(f"MC {version} is not installed. Can't randomize loot.")
+            return False
         self._add_loot_tables(seed)
         # Clean up extracted loot tables
         shutil.rmtree(f"{os.getcwd()}/data", ignore_errors=True)
+        return True
 
-    def _extract_loot_tables(self, jar_path: str) -> None:
+    def _extract_loot_tables(self, version: str) -> bool:
         """ Extract the loot tables from a Minecraft client jar.
 
-        :param jar_path: The path to the Minecraft jar.
+        :param version: The version of Minecraft to use as base (e.g. '1.15.2').
+        :return: False if version is not installed
         """
-        cu.log(f"Extracting {os.path.split(jar_path)[-1]} loot tables")
+        jar_path = cu.find_installed_minecraft_versions().get(version, None)
+        if not jar_path:
+            return False
+        cu.log(f"Extracting {os.path.split(jar_path)[-1][:-4]} loot tables")
         with ZipFile(jar_path) as jar_file:
             for item in jar_file.namelist():
                 if item.startswith("data/minecraft/loot_tables"):
@@ -57,6 +64,7 @@ class RandomLootDataPack(Datapack):
                         exist_ok=True)
                     with open(item_output, "wb") as item_file:
                         item_file.write(jar_file.read(item))
+        return True
 
     def _add_loot_tables(self, seed: int = None) -> None:
         """ Randomize the loot tables contents and add them to this datapack.

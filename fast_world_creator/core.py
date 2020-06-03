@@ -6,15 +6,13 @@ from fast_world_creator.new_world import world_creator
 from fast_world_creator.utils import common_utils as cu
 
 
-def run(version_pair: Tuple[str, str], world_name: str, seed: int,
-        datapacks: List[Datapack], gamerules: dict, difficulty: int = 2,
-        game_mode: int = 0, generator: str = "default",
-        generator_options: dict = None, raining: bool = False,
-        thundering: bool = False) -> None:
+def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
+        gamerules: dict, difficulty: int = 2, game_mode: int = 0,
+        generator: str = "default", generator_options: dict = None,
+        raining: bool = False, thundering: bool = False) -> None:
     """ Create a minecraft world with the specified parameters.
 
-    :param version_pair: Tuple containing the version name (e.g. '1.15.2') and
-        the path to the Minecraft .jar file
+    :param version: Version name (e.g. '1.15.2')
     :param world_name: The name of the world to create.
     :param seed: The seed to use for the Minecraft world and the randomization
         of the random_loot datapack.
@@ -31,19 +29,20 @@ def run(version_pair: Tuple[str, str], world_name: str, seed: int,
         the raining parameter if set to True.
     """
     wc = world_creator.WorldCreator(
-        mc_release=version_pair[0],
+        mc_release=version,
         world_name=world_name or f"FastNewWorld_{random.randint(0, 1000000)}",
         seed=seed
     )
     owd = cu.change_directory(wc.create_world_directory())
+    created_datapacks = []
     if datapacks:
         wc.create_datapack_directory()
         for d in datapacks:
-            d.create_datapack_files(seed=wc.seed, jar_path=version_pair[1])
-    else:
-        datapacks = ""
+            created = d.create_datapack_files(seed=wc.seed, version=version)
+            if created:
+                created_datapacks.append(d.name)
     wc.create_level_dat(
-        datapack_list=[d.name for d in datapacks],
+        datapack_list=created_datapacks,
         difficulty=difficulty,
         gamerules=gamerules,
         game_mode=game_mode,

@@ -25,7 +25,7 @@ def enum_to_cb_contents(cls: Type[Enum]) -> List[str]:
     return [e.name.title() for e in cls]
 
 
-installed_versions = cu.find_installed_minecraft_versions()
+mc_versions = [str(k) for k in list(mu.get_version_map().keys())]
 available_datapacks = du.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
 difficulties = enum_to_cb_contents(mu.Difficulties)
@@ -57,12 +57,8 @@ def create_layouts():
         """
         c1_layout = [[
             sg.T('MC Version', size=(10, 1)),
-            sg.Combo(
-                [k for k in installed_versions.keys()],
-                default_value=list(installed_versions.keys())[-1],
-                size=(18, 1),
-                readonly=True,
-                key="release")
+            sg.Combo(mc_versions, mc_versions[0], (18, 1), readonly=True,
+                     key="release")
         ]]
         c1_layout += [[
             sg.T('World Name', size=(10, 1)),
@@ -282,10 +278,7 @@ def create(values: dict) -> None:
         # Gamerules always stored as strings
         updated_gamerules[gr] = str(values.get(gr)).lower()
     core.run(
-        version_pair=(
-            values.get("release"),
-            installed_versions[values.get("release")]
-        ),
+        version=values.get("release"),
         world_name=values.get("name").replace(" ", "_"),
         seed=values.get("seed"),
         difficulty=difficulties.index(values.get("difficulty")),
