@@ -25,7 +25,9 @@ def enum_to_cb_contents(cls: Type[Enum]) -> List[str]:
     return [e.name.title() for e in cls]
 
 
-mc_versions = [str(k) for k in list(mu.get_version_map().keys())]
+supported_mc_versions = [k for k in mu.version_map]
+installed_mc_versions = [k for k in cu.find_installed_minecraft_versions()]
+installed_mc_versions.sort(reverse=True)
 available_datapacks = du.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
 difficulties = enum_to_cb_contents(mu.Difficulties)
@@ -56,9 +58,19 @@ def create_layouts():
         main tab, and populated from the assets/imported_datapacks folder.
         """
         c1_layout = [[
-            sg.T('MC Version', size=(10, 1)),
-            sg.Combo(mc_versions, mc_versions[0], (18, 1), readonly=True,
-                     key="release")
+            sg.Frame("Version", [[
+                sg.T('MC Version', size=(10, 1)),
+                sg.Combo(installed_mc_versions, installed_mc_versions[0],
+                         (18, 1), readonly=True, key="release")
+                ],
+                [
+                    sg.Radio("Installed versions", "radio_versions", True,
+                             enable_events=True,
+                             key="radio_installed_versions"),
+                    sg.Radio("All versions", "radio_versions",
+                             enable_events=True, key="radio_all_versions")
+                ]
+            ])
         ]]
         c1_layout += [[
             sg.T('World Name', size=(10, 1)),
@@ -81,7 +93,7 @@ def create_layouts():
         ]]
         c2_layout = [[sg.Frame('Weather', create_weather_layout())]]
         layout = [[
-            sg.Col(c1_layout, pad=(5, 7)), sg.Col(c2_layout, pad=(0, 17))
+            sg.Col(c1_layout, pad=(0, 7)), sg.Col(c2_layout, pad=(0, 7))
         ]]
         layout += [[
             sg.Frame('Datapacks', create_datapack_layout(), size=(50, 1))
@@ -305,6 +317,10 @@ while True:
     event, val_dict = window.read()
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel
         break
+    if event == "radio_installed_versions":
+        window["release"].update(values=installed_mc_versions)
+    elif event == "radio_all_versions":
+        window["release"].update(values=supported_mc_versions)
     if event == "generator":
         if val_dict[event] == mu.GeneratorNames.BUFFET.name.title():
             window["buffet_option_frame"].unhide_row()

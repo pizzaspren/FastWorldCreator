@@ -1,5 +1,5 @@
 import enum
-from typing import List
+from typing import List, Dict
 
 
 class Difficulties(enum.IntEnum):
@@ -67,23 +67,18 @@ def get_mc_definitions(resource: str) -> List[str]:
         return [line.rstrip("\n") for line in f.readlines() if line]
 
 
-def get_version_map() -> dict:
-    """ Get the mapping between a release name and its data version.
-
-    For more information, visit https://minecraft.gamepedia.com/Data_version.
-    :return: A map of all the full releases between 1.13 and 1.15.2 (inclusive)
-        and their data versions.
-    """
-    return {
-        "1.15.2": "2230",
-        "1.15.1": "2227",
-        "1.15": "2225",
-        "1.14.4": "1976",
-        "1.14.3": "1968",
-        "1.14.2": "1963",
-        "1.14.1": "1957",
-        "1.14": "1952",
-        "1.13.2": "1631",
-        "1.13.1": "1628",
-        "1.13": "1519",
-    }
+# Mapping between a release name and its data version.
+# For more information, visit https://minecraft.gamepedia.com/Data_version.
+version_map: Dict[str, str] = {
+    "1.15.2": "2230",
+    "1.15.1": "2227",
+    "1.15": "2225",
+    "1.14.4": "1976",
+    "1.14.3": "1968",
+    "1.14.2": "1963",
+    "1.14.1": "1957",
+    "1.14": "1952",
+    "1.13.2": "1631",
+    "1.13.1": "1628",
+    "1.13": "1519",
+}

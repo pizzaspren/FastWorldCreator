@@ -22,7 +22,7 @@ class WorldCreator:
         except ValueError:
             # No parsable integer. Create hash and convert lowest values to int
             self.seed = int(hl.md5(seed.encode("utf-8")).hexdigest()[:7], 16)
-        self.w_dir = os.sep.join([cu.get_mc_folder(), "saves", self.name])
+        self.w_dir = f"{cu.MC_FOLDER}/saves/{self.name}"
 
     def create_world_directory(self) -> str:
         """ Create the world folder based on the world name.
@@ -73,7 +73,7 @@ class WorldCreator:
         mc = "minecraft:"
         level_dat_dict = {
             "Version": {
-                "Id": mu.get_version_map().get(self.mc_release),
+                "Id": mu.version_map.get(self.mc_release),
                 "Name": self.mc_release
             },
             "LevelName": self.name,
