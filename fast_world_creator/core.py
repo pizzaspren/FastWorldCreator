@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, List
+from typing import Generator, List
 
 from fast_world_creator.datapacks.base_datapack import Datapack
 from fast_world_creator.new_world import world_creator
@@ -10,7 +10,7 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
         gamerules: dict, difficulty: int = 2, game_mode: int = 0,
         generator: str = "default", generator_options: dict = None,
         raining: bool = False, thundering: bool = False,
-        border_settings: dict = None) -> None:
+        border_settings: dict = None) -> Generator[int, None, None]:
     """ Create a minecraft world with the specified parameters.
 
     :param version: Version name (e.g. '1.15.2')
@@ -37,6 +37,7 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
         seed=seed
     )
     owd = cu.change_directory(wc.create_world_directory())
+    yield
     created_datapacks = []
     if datapacks:
         wc.create_datapack_directory()
@@ -44,6 +45,7 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
             created = d.create_datapack_files(seed=wc.seed, version=version)
             if created:
                 created_datapacks.append(d.name)
+                yield
     wc.create_level_dat(
         datapack_list=created_datapacks,
         difficulty=difficulty,
@@ -56,3 +58,4 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
         border_settings=border_settings
     )
     cu.change_directory(owd)
+    yield

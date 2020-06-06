@@ -1,5 +1,6 @@
+from functools import partial
 from enum import Enum
-from typing import List, Type
+from typing import List, Type, Generator, Union
 
 import PySimpleGUI as sg
 
@@ -300,7 +301,11 @@ def create_layouts():
     tab4 = sg.Tab("Border", create_border_options())
     main_layout = [
         [sg.TabGroup([[tab1, tab2, tab3, tab4]])],
-        [sg.Button('Ok'), sg.Button('Cancel')]
+        [
+            sg.Button('Ok'), sg.Button('Cancel'),
+            sg.ProgressBar(100, "horizontal", (20, 23), pad=(10, 0),
+                           key="progress_bar")
+        ]
     ]
     return main_layout
 
@@ -341,8 +346,8 @@ def parse_border_options(values: dict) -> dict:
     return border_opts
 
 
-def create(values: dict) -> None:
-    """ Start the creation of the Minecraft world.
+def create(values: dict) -> Generator[Union[str, int], None, None]:
+    """ Start the creation of the Minecraft world and update the progress bar.
 
     :param values: The values generated from the PySimpleGUI window event."""
     updated_gamerules = dict()
@@ -350,12 +355,15 @@ def create(values: dict) -> None:
         # Gamerules always stored as strings
         updated_gamerules[gr] = str(values.get(gr)).lower()
     parse_border_options(values)
-    core.run(
+    enabled_dp = [dp for dp in available_datapacks if values[dp.name]]
+
+    execution = partial(
+        core.run,
         version=values.get("release"),
         world_name=values.get("name").replace(" ", "_"),
         seed=values.get("seed"),
         difficulty=difficulties.index(values.get("difficulty")),
-        datapacks=[dp for dp in available_datapacks if values[dp.name]],
+        datapacks=enabled_dp,
         gamerules=updated_gamerules,
         game_mode=game_modes.index(values.get("game_mode")),
         generator=values.get("generator").lower(),
@@ -364,6 +372,15 @@ def create(values: dict) -> None:
         thundering=values.get("thunder"),
         border_settings=parse_border_options(values)
     )
+    yield "start"
+    # World folder, datapacks, level.dat
+    total_yields = len(enabled_dp) + 2
+    yield_counter = 0
+    for _ in execution():
+        yield_counter += 1
+        yield yield_counter / total_yields * 100
+    yield 100
+    yield "done"
 
 
 window = sg.Window(
@@ -374,9 +391,11 @@ window = sg.Window(
 window["buffet_option_frame"].hide_row()
 window["flat_option_frame"].hide_row()
 window["buffet_size"].hide_row()
+window["border_damage"].Widget.configure(justify="right")
+window["progress_bar"].update(visible=False)
 
 while True:
-    event, val_dict = window.read()
+    event, val_dict = window.read(1000)
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel
         break
     if event == "radio_installed_versions":
@@ -410,7 +429,15 @@ while True:
             value=superflat_dict[val_dict[event]][SF_STRUCT])
 
     if event == "Ok":
-        create(val_dict)
-        break
+        for status in create(val_dict):
+            window.read(timeout=20)
+            if status == "start":
+                window["progress_bar"].update(visible=True)
+                window["progress_bar"].UpdateBar(0)
+            elif status == "done":
+                window["progress_bar"].update(visible=False)
+            else:
+                window["progress_bar"].UpdateBar(status)
+
 
 window.close()
