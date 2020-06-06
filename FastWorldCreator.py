@@ -57,43 +57,43 @@ def create_layouts():
         seed, game mode and difficulty. Datapack selection is bundled in the
         main tab, and populated from the assets/imported_datapacks folder.
         """
-        c1_layout = [[
+        layout = [[
             sg.Frame("Version", [[
-                sg.T('MC Version', size=(10, 1)),
+                sg.T('Minecraft Version', size=(15, 1)),
                 sg.Combo(installed_mc_versions, installed_mc_versions[0],
-                         (18, 1), readonly=True, key="release")
+                         (25, 1), readonly=True, key="release")
                 ],
                 [
-                    sg.Radio("Installed versions", "radio_versions", True,
+                    sg.Radio("Show installed versions", "radio_versions", True,
                              enable_events=True,
                              key="radio_installed_versions"),
-                    sg.Radio("All versions", "radio_versions",
+                    sg.Radio("Show all versions", "radio_versions",
                              enable_events=True, key="radio_all_versions")
                 ]
             ])
         ]]
-        c1_layout += [[
+        c1_layout = [[
             sg.T('World Name', size=(10, 1)),
-            sg.I(size=(20, 1), key="name")
+            sg.I(size=(21, 1), key="name")
         ]]
         c1_layout += [[
             sg.T('Seed', size=(10, 1), tooltip="Leave blank for random seed"),
-            sg.I(size=(20, 1), tooltip="Leave blank for random seed",
+            sg.I(size=(21, 1), tooltip="Leave blank for random seed",
                  key="seed")
         ]]
         c1_layout += [[
             sg.T('Difficulty', size=(10, 1)),
-            sg.Combo(difficulties, difficulties[0], (18, 1), readonly=True,
+            sg.Combo(difficulties, difficulties[0], (19, 1), readonly=True,
                      key="difficulty")
         ]]
         c1_layout += [[
             sg.T('Game mode', size=(10, 1)),
-            sg.Combo(game_modes, game_modes[0], (18, 1), readonly=True,
+            sg.Combo(game_modes, game_modes[0], (19, 1), readonly=True,
                      key="game_mode")
         ]]
         c2_layout = [[sg.Frame('Weather', create_weather_layout())]]
-        layout = [[
-            sg.Col(c1_layout, pad=(0, 7)), sg.Col(c2_layout, pad=(0, 7))
+        layout += [[
+            sg.Col(c1_layout, pad=(0, 5)), sg.Col(c2_layout, pad=(0, 0))
         ]]
         layout += [[
             sg.Frame('Datapacks', create_datapack_layout(), size=(50, 1))
@@ -243,11 +243,63 @@ def create_layouts():
         ]]
         return layout
 
+    def create_border_options():
+        layout = [[
+            sg.Frame("Border center", [[
+                sg.T("X"), sg.I("0", (19, 1), key="border_x"),
+                sg.T("Z"), sg.I("0", (19, 1), key="border_z"),
+            ]])
+        ]]
+        layout += [[
+            sg.Frame("Border size", [
+                [
+                    sg.T("Initial size", (8, 1)),
+                    sg.I("60000000", (10, 1), justification="right",
+                         key="border_size")
+                ],
+                [
+                    sg.T("Final size", (8, 1)),
+                    sg.I("60000000", (10, 1), justification="right",
+                         key="border_size_target")
+                ],
+                [
+                    sg.T("Lerp time", (8, 1),
+                         tooltip="Seconds until border reaches final size"),
+                    sg.I("0", (10, 1), justification="right",
+                         key="border_lerp_time")
+                ]
+            ])
+        ]]
+        layout += [[
+            sg.Frame("Warning zone", [
+                [
+                    sg.T("Damage per block", (15, 1)),
+                    sg.Spin([str(x / 10) for x in range(201)], "0.2",
+                            size=(10, 1), key="border_damage")
+
+                ],
+                [
+                    sg.T("Safe distance", (15, 1)),
+                    sg.I("5", (11, 1), key="border_safe_blocks")
+                ],
+                [
+                    sg.T("Warning time", (15, 1)),
+                    sg.I("15", (11, 1), key="border_warn_time")
+                ],
+                [
+                    sg.T("Warning distance", (15, 1)),
+                    sg.I("5", (11, 1), key="border_warn_blocks")
+                ]
+            ])
+        ]]
+        return layout
+
     tab1 = sg.Tab("Main", create_main_tab_layout())
     tab2 = sg.Tab("Gamerules", create_gamerule_layout())
     tab3 = sg.Tab("Terrain", create_terrain_layout())
+    tab4 = sg.Tab("Border", create_border_options())
     main_layout = [
-        [sg.TabGroup([[tab1, tab2, tab3]])],
+        [sg.TabGroup([[tab1, tab2, tab3, tab4]])],
         [sg.Button('Ok'), sg.Button('Cancel')]
     ]
     return main_layout
@@ -281,6 +333,14 @@ def parse_generator_options(values: dict) -> dict:
     }
 
 
+def parse_border_options(values: dict) -> dict:
+    border_opts = {}
+    for k in list(values.keys()):
+        if str(k).startswith("border_"):
+            border_opts[k[len("border_"):]] = values.get(k)
+    return border_opts
+
+
 def create(values: dict) -> None:
     """ Start the creation of the Minecraft world.
 
@@ -289,6 +349,7 @@ def create(values: dict) -> None:
     for gr in gamerules:
         # Gamerules always stored as strings
         updated_gamerules[gr] = str(values.get(gr)).lower()
+    parse_border_options(values)
     core.run(
         version=values.get("release"),
         world_name=values.get("name").replace(" ", "_"),
@@ -300,7 +361,8 @@ def create(values: dict) -> None:
         generator=values.get("generator").lower(),
         generator_options=parse_generator_options(values),
         raining=values.get("rain"),
-        thundering=values.get("thunder")
+        thundering=values.get("thunder"),
+        border_settings=parse_border_options(values)
     )
 
 

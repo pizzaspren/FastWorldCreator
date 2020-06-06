@@ -9,7 +9,8 @@ from fast_world_creator.utils import common_utils as cu
 def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
         gamerules: dict, difficulty: int = 2, game_mode: int = 0,
         generator: str = "default", generator_options: dict = None,
-        raining: bool = False, thundering: bool = False) -> None:
+        raining: bool = False, thundering: bool = False,
+        border_settings: dict = None) -> None:
     """ Create a minecraft world with the specified parameters.
 
     :param version: Version name (e.g. '1.15.2')
@@ -27,6 +28,8 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
     :param raining: Whether it should be raining in the world.
     :param thundering: Whether it should be thundering in the world. Overrides
         the raining parameter if set to True.
+    :param border_settings: Dictionary containing all the options for the world
+        border.
     """
     wc = world_creator.WorldCreator(
         mc_release=version,
@@ -49,6 +52,7 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
         generator=generator,
         generator_opts=generator_options,
         raining=raining,
-        thundering=thundering
+        thundering=thundering,
+        border_settings=border_settings
     )
     cu.change_directory(owd)

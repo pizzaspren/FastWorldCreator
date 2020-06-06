@@ -3,9 +3,9 @@ import os
 import random
 from typing import List
 
+from fast_world_creator.new_world.level_dat import LevelFile
 from fast_world_creator.utils import common_utils as cu
 from fast_world_creator.utils import minecraft_utils as mu
-from fast_world_creator.new_world.level_dat import LevelFile
 
 
 class WorldCreator:
@@ -50,8 +50,9 @@ class WorldCreator:
 
     def create_level_dat(self, gamerules: dict, difficulty: int,
                          datapack_list: List[str], game_mode: int = 0,
-                         raining: bool = False,
-                         thundering: bool = False, generator: str = "default",
+                         raining: bool = False, thundering: bool = False,
+                         border_settings: dict = None,
+                         generator: str = "default",
                          generator_opts: dict = None) -> None:
         """ Creates the level.dat NBT file in the new world folder.
 
@@ -61,9 +62,11 @@ class WorldCreator:
         :param datapack_list: The list of datapack names to enable in the world.
         :param game_mode: An integer representing the game mode of the player.
         :param raining: A boolean value indicating whether rain should be
-            enabled. Gets overriden if the parameter thundering is True.
+            enabled. Gets overridden if the parameter thundering is True.
         :param thundering: A boolean value indicating whether thunder should be
             enabled. Overrides the parameter raining if set to True
+        :param border_settings: Dictionary containing all the options for the
+            world border.
         :param generator: The name of the terrain generator to use in the world.
         :param generator_opts: A dictionary containing the options for the flat
             and buffet terrain generators. If the parameter generator is neither
@@ -88,7 +91,17 @@ class WorldCreator:
             "GameRules": gamerules,
             "GameType": game_mode,
             "raining": True if thundering else raining,
-            "thundering": thundering or False
+            "thundering": thundering or False,
+            "BorderCenterX": float(border_settings.get("x")),
+            "BorderCenterZ": float(border_settings.get("z")),
+            "BorderDamagePerBlock": float(border_settings.get("damage")),
+            "BorderSafeZone": float(border_settings.get("safe_blocks")),
+            "BorderSize": float(border_settings.get("size")),
+            "BorderSizeLerpTarget": float(border_settings.get("size_target")),
+            "BorderSizeLerpTime": int(
+                float(border_settings.get("lerp_time")) * 600),
+            "BorderWarningBlocks": float(border_settings.get("warn_blocks")),
+            "BorderWarningTime": float(border_settings.get("warn_time"))
         }
         if mu.GeneratorNames(generator) == mu.GeneratorNames.BUFFET:
             generator_options_dict = {
@@ -96,16 +109,17 @@ class WorldCreator:
                     "type": mc + generator_opts.get("buffet_biome_type"),
                     "options": {
                         "size": generator_opts.get('buffet_size'),
-                        "biomes": [mc+biome for biome in
+                        "biomes": [mc + biome for biome in
                                    generator_opts.get("buffet_biomes")]
                     }
                 },
                 "chunk_generator": {
                     "options": {
-                        "default_block": mc+generator_opts.get("buffet_block"),
-                        "default_fluid": mc+generator_opts.get("buffet_fluid")
+                        "default_block": mc + generator_opts.get(
+                            "buffet_block"),
+                        "default_fluid": mc + generator_opts.get("buffet_fluid")
                     },
-                    "type": mc+generator_opts.get("buffet_chunk_type")
+                    "type": mc + generator_opts.get("buffet_chunk_type")
                 }
             }
             level_dat_dict["generatorOptions"] = generator_options_dict
@@ -113,11 +127,11 @@ class WorldCreator:
             generator_layers = []
             for layer in generator_opts.get("flat_layers"):
                 generator_layers.append({
-                    "block": mc+layer[1],
+                    "block": mc + layer[1],
                     "height": str(layer[0])
                 })
             generator_options_dict = {
-                "biome": mc+generator_opts.get("flat_biome"),
+                "biome": mc + generator_opts.get("flat_biome"),
                 "layers": generator_layers,
                 "structures": generator_opts.get("flat_structures")
             }
