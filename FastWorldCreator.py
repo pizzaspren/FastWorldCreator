@@ -11,12 +11,16 @@ from fast_world_creator.utils import datapack_utils as du
 from fast_world_creator.utils import minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
 
+config = cu.get_or_create_config()
+
 log_format = "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s"
-logging.basicConfig(filename="output.log", format=log_format,
-                    level=logging.INFO)
+logging.basicConfig(filename=config.get("LOGGING", "file"),
+                    format=log_format,
+                    level=logging.getLevelName(config.get("LOGGING", "level") or
+                                               "INFO"))
 logging.info("Initializing")
 
-sg.theme('DarkAmber')  # Add a touch of color
+sg.theme(config.get("UI", "theme"))  # Add a touch of color
 sg.SetOptions(
     input_elements_background_color='#E9E9E9',
     input_text_color="#000000"
@@ -260,6 +264,11 @@ def create_layouts():
         return layout
 
     def create_border_options():
+        """Create layout for the world border tab.
+
+        Contains all the available options for the modification of the world
+        border.
+        """
         logging.debug("Creating world border layout")
         layout = [[
             sg.Frame("Border center", [[
@@ -358,6 +367,11 @@ def parse_generator_options(values: dict) -> dict:
 
 
 def parse_border_options(values: dict) -> dict:
+    """ Extract the world border options from the values dictionary.
+
+    :param values: The values generated from the PySimpleGUI window event.
+    :return: The border options.
+    """
     logging.info("Extracting world border options")
     border_opts = {}
     for k in list(values.keys()):

@@ -1,11 +1,31 @@
 import logging
 import os
+from configparser import ConfigParser
 from functools import lru_cache
 from typing import Dict
 
 from fast_world_creator.utils import minecraft_utils as mu
 
 MC_FOLDER = f"{os.getenv('APPDATA')}/.minecraft"
+
+
+def get_or_create_config():
+    """ Read the configuration file, or create it if not present.
+
+    :return: The program configuration values.
+    """
+    cfg = ConfigParser()
+    if not cfg.read('config.ini'):
+        cfg["LOGGING"] = {
+            "file": "output.log",
+            "level": "INFO"
+        }
+        cfg["UI"] = {
+            "theme": "DarkAmber"
+        }
+        with open("config.ini", "w") as config_file:
+            cfg.write(config_file)
+    return cfg
 
 
 @lru_cache(maxsize=4)
