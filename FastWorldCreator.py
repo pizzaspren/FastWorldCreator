@@ -329,8 +329,8 @@ def create_layouts():
         [sg.TabGroup([[tab1, tab2, tab3, tab4]])],
         [
             sg.Button('Ok'), sg.Button('Cancel'),
-            sg.ProgressBar(100, "horizontal", (20, 23), pad=(10, 0),
-                           key="progress_bar")
+            sg.T("", (4, 0)),
+            sg.ProgressBar(100, "horizontal", (20, 23), key="progress_bar")
         ]
     ]
     return main_layout
