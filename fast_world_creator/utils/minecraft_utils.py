@@ -1,4 +1,5 @@
 import enum
+import logging
 from typing import List, Dict
 
 
@@ -63,6 +64,7 @@ def get_mc_definitions(resource: str) -> List[str]:
     :return: The lines of the file assets/minecraft_definitions/<resource>,
         without the line breaks.
     """
+    logging.info(f"Loading definitions for '{resource}'")
     with open(f"assets/minecraft_definitions/{resource}.txt", "r") as f:
         return [line.rstrip("\n") for line in f.readlines() if line]
 

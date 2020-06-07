@@ -1,20 +1,11 @@
+import logging
 import os
 from functools import lru_cache
 from typing import Dict
 
 from fast_world_creator.utils import minecraft_utils as mu
 
-
 MC_FOLDER = f"{os.getenv('APPDATA')}/.minecraft"
-
-
-def log(msg: str, sym: str = "#") -> None:
-    """ Log a formatted message.
-
-    :param msg: The message to log.
-    :param sym: The symbol to use for flair.
-    """
-    print(f"{sym * 3} {msg:^40} {sym * 3}")
 
 
 @lru_cache(maxsize=4)
@@ -32,7 +23,7 @@ def find_installed_minecraft_versions(mc_dir: str = None) -> Dict:
     :param mc_dir: The Minecraft installation directory (.minecraft)
     :return: A dictionary containing the installed (and supported) minecraft
         versions and the path to the Jar files."""
-    log("Looking for installed minecraft versions")
+    logging.info("Looking for installed minecraft versions")
     if not mc_dir:
         mc_dir = MC_FOLDER
     installations_folder = f"{mc_dir}/versions"
@@ -46,10 +37,9 @@ def find_installed_minecraft_versions(mc_dir: str = None) -> Dict:
                 version_jar = f"{version_folder}/{i}.jar"
                 if os.path.isfile(version_jar):
                     installed_versions[str(i)] = str(version_jar)
-    log(f"Found {len(installed_versions)} installed version(s)")
+    logging.info(f"Found {len(installed_versions)} installed version(s)")
     if not installed_versions:
-        log("Aborting...")
-        exit(0)
+        logging.warning("There are no installed Minecraft versions")
     return installed_versions
 
 
@@ -58,6 +48,7 @@ def change_directory(to_dir: str) -> str:
 
     :param to_dir: The directory to change to.
     :return: The execution directory before changing directory. """
+    logging.debug(f"Changing to directory {to_dir}")
     owd = os.getcwd()
     os.chdir(to_dir)
     return owd

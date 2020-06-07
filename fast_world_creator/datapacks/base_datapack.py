@@ -1,3 +1,6 @@
+import logging
+
+
 class Datapack:
 
     def __init__(self):
@@ -9,7 +12,9 @@ class Datapack:
 
     def create_datapack_files(self, *args, **kwargs) -> bool:
         """ Create the necessary files and store the datapack as a file. """
+        logging.info(f"Creating files for datapack '{self.name}'")
         if self._create_datapack_files(*args, **kwargs):
+            logging.info(f"Storing files for datapack '{self.name}'")
             self.store()
             return True
 

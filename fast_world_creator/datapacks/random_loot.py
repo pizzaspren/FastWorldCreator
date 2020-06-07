@@ -1,5 +1,6 @@
 import io
 import json
+import logging
 import os
 import random
 import shutil
@@ -38,7 +39,6 @@ class RandomLootDataPack(Datapack):
             )
         })
         if not self._extract_loot_tables(version):
-            cu.log(f"MC {version} is not installed. Can't randomize loot.")
             return False
         self._add_loot_tables(seed)
         # Clean up extracted loot tables
@@ -53,8 +53,9 @@ class RandomLootDataPack(Datapack):
         """
         jar_path = cu.find_installed_minecraft_versions().get(version, None)
         if not jar_path:
+            logging.error(f"{version} is not installed. Can't randomize loot.")
             return False
-        cu.log(f"Extracting {os.path.split(jar_path)[-1][:-4]} loot tables")
+        logging.info(f"Extracting {version} loot tables")
         with ZipFile(jar_path) as jar_file:
             for item in jar_file.namelist():
                 if item.startswith("data/minecraft/loot_tables"):
@@ -87,6 +88,8 @@ class RandomLootDataPack(Datapack):
         lt_file_contents = lt_files.copy()
         if seed is None:
             seed = random.randint(0, 1000000)
+        logging.info(
+            f"Randomizing {len(lt_files)} loot tables with seed = {seed}")
         random.seed(seed)
         random.shuffle(lt_file_contents)
         for lt_file, lt_content in zip(lt_files, lt_file_contents):

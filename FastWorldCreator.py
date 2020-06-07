@@ -1,5 +1,6 @@
-from functools import partial
+import logging
 from enum import Enum
+from functools import partial
 from typing import List, Type, Generator, Union
 
 import PySimpleGUI as sg
@@ -9,6 +10,11 @@ from fast_world_creator.utils import common_utils as cu
 from fast_world_creator.utils import datapack_utils as du
 from fast_world_creator.utils import minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
+
+log_format = "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s"
+logging.basicConfig(filename="output.log", format=log_format,
+                    level=logging.INFO)
+logging.info("Initializing")
 
 sg.theme('DarkAmber')  # Add a touch of color
 sg.SetOptions(
@@ -58,11 +64,13 @@ def create_layouts():
         seed, game mode and difficulty. Datapack selection is bundled in the
         main tab, and populated from the assets/imported_datapacks folder.
         """
+        logging.debug("Creating main tab layout")
         layout = [[
-            sg.Frame("Version", [[
-                sg.T('Minecraft Version', size=(15, 1)),
-                sg.Combo(installed_mc_versions, installed_mc_versions[0],
-                         (25, 1), readonly=True, key="release")
+            sg.Frame("Version", [
+                [
+                    sg.T('Minecraft Version', size=(15, 1)),
+                    sg.Combo(installed_mc_versions, installed_mc_versions[0],
+                             (25, 1), readonly=True, key="release")
                 ],
                 [
                     sg.Radio("Show installed versions", "radio_versions", True,
@@ -106,6 +114,7 @@ def create_layouts():
 
         Contains selection for rain/clear/thundering weather.
         """
+        logging.debug("Creating weather layout")
         layout = [
             [sg.Radio("Clear", "weather", True)],
             [sg.Radio("Rain", "weather", key="rain")],
@@ -120,10 +129,12 @@ def create_layouts():
         selected with a Checkbox, which has a default state equal to the
         datapack's 'default_enabled' field.
         """
+        logging.debug("Creating datapack layout")
         grouped_packs = [
             available_datapacks[i:i + 2] for i in
             range(0, len(available_datapacks), 2)
         ]
+        logging.debug(f"Found {len(grouped_packs)} pairs of datapacks")
         c1_layout, c2_layout = sg.Sizer(20, 1), sg.Sizer(20, 1)
         for d_pair in grouped_packs:
             for d, c in zip(d_pair, [c1_layout, c2_layout]):
@@ -139,6 +150,7 @@ def create_layouts():
         column. The gamerules with a boolean value are assigned a CheckBox, and
         the gamerules with an integer value are assigned an Input element
         """
+        logging.debug("Creating gamerule layout")
         grouped = sg.Column([[]], scrollable=True, vertical_scroll_only=True)
         for gr in gamerules.keys():
             col1, col2 = sg.Sizer(20, 1), sg.Sizer(15, 1)
@@ -159,6 +171,7 @@ def create_layouts():
         Contains all the options for the different terrain generators available
         in the game (1.13 until pre-20w21a).
         """
+        logging.debug("Creating terrain layout")
         layout = []
         layout += [[
             sg.T("World type", (16, 1), pad=(10, 10)),
@@ -180,6 +193,7 @@ def create_layouts():
         the assets folder and put into fields that can be easily differentiated
         by the users.
         """
+        logging.debug("Creating buffet layout")
         layout = [[
             sg.T("Chunk generator", (15, 1)),
             sg.Combo(chunk_generator_types, chunk_generator_types[0],
@@ -222,6 +236,7 @@ def create_layouts():
         The data is pulled from the assets folder and put into fields that can
         be easily differentiated by the users.
         """
+        logging.debug("Creating superflat layout")
         layout = []
         layout += [[
             sg.T("Presets", (15, 1)),
@@ -245,6 +260,7 @@ def create_layouts():
         return layout
 
     def create_border_options():
+        logging.debug("Creating world border layout")
         layout = [[
             sg.Frame("Border center", [[
                 sg.T("X"), sg.I("0", (19, 1), key="border_x"),
@@ -295,6 +311,7 @@ def create_layouts():
         ]]
         return layout
 
+    logging.debug("Creating window tabs")
     tab1 = sg.Tab("Main", create_main_tab_layout())
     tab2 = sg.Tab("Gamerules", create_gamerule_layout())
     tab3 = sg.Tab("Terrain", create_terrain_layout())
@@ -314,6 +331,7 @@ def parse_generator_options(values: dict) -> dict:
     """ Extract terrain generator options into a semi-parsed dictionary.
 
     :param values: The values generated from the PySimpleGUI window event."""
+
     def parse_flat_layers():
         layers = []
         for layer in values.get("flat_layers").split(","):
@@ -323,6 +341,7 @@ def parse_generator_options(values: dict) -> dict:
                 layers.append((1, layer))
         return layers
 
+    logging.info("Parsing terrain generation options")
     return {
         "buffet_biome_type": values.get("buffet_biome_type").lower(),
         "buffet_biomes": [b for b in biomes if values[f"buffet_biome_{b}"]],
@@ -339,6 +358,7 @@ def parse_generator_options(values: dict) -> dict:
 
 
 def parse_border_options(values: dict) -> dict:
+    logging.info("Extracting world border options")
     border_opts = {}
     for k in list(values.keys()):
         if str(k).startswith("border_"):
@@ -350,6 +370,7 @@ def create(values: dict) -> Generator[Union[str, int], None, None]:
     """ Start the creation of the Minecraft world and update the progress bar.
 
     :param values: The values generated from the PySimpleGUI window event."""
+    logging.info("Preparing core execution")
     updated_gamerules = dict()
     for gr in gamerules:
         # Gamerules always stored as strings
@@ -432,12 +453,13 @@ while True:
         for status in create(val_dict):
             window.read(timeout=20)
             if status == "start":
+                logging.info("Starting execution")
                 window["progress_bar"].update(visible=True)
                 window["progress_bar"].UpdateBar(0)
             elif status == "done":
+                logging.info("Execution finished successfully")
                 window["progress_bar"].update(visible=False)
             else:
                 window["progress_bar"].UpdateBar(status)
-
 
 window.close()

@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Union
 
 from fast_world_creator.datapacks.external_datapack import ExternalDatapack
@@ -22,4 +23,5 @@ def get_available_datapacks() -> List[
         if z.endswith(".zip"):
             dp = ExternalDatapack(f"{external_datapack_folder}/{z}")
             datapacks.append(dp)
+    logging.info(f"Found {len(datapacks)} available datapacks")
     return datapacks

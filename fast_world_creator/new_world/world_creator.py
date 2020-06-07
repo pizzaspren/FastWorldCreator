@@ -1,4 +1,5 @@
 import hashlib as hl
+import logging
 import os
 import random
 from typing import List
@@ -14,7 +15,7 @@ class WorldCreator:
         self.mc_release = mc_release
         self.name = world_name
         if not seed:
-            # Empty seed, create random seed
+            logging.info("Seed was empty. Creating randomized seed.")
             seed = random.randint(0, 1000000)
         try:
             # Try to parse integer
@@ -22,6 +23,7 @@ class WorldCreator:
         except ValueError:
             # No parsable integer. Create hash and convert lowest values to int
             self.seed = int(hl.md5(seed.encode("utf-8")).hexdigest()[:7], 16)
+        logging.info(f"Seed = {self.seed}")
         self.w_dir = f"{cu.MC_FOLDER}/saves/{self.name}"
 
     def create_world_directory(self) -> str:
@@ -34,11 +36,12 @@ class WorldCreator:
         try:
             if os.path.isdir(self.w_dir):
                 self.w_dir += str(self.seed)
+            logging.info(f"Creating world folder {self.w_dir}")
             os.mkdir(self.w_dir)
             return self.w_dir
-        except FileExistsError:
-            cu.log(f"World \'{self.name}\' already exists. Aborting")
-            exit(-1)
+        except FileExistsError as e:
+            logging.error(f"World folder \'{self.name}\' already exists")
+            raise e
 
     def create_datapack_directory(self) -> None:
         """ Create the datapack directory used to store all the datapack zips.
@@ -46,6 +49,7 @@ class WorldCreator:
         Creates a folder named 'datapacks' in the world directory. Will
         intentionally fail if the world directory has not been created yet.
         """
+        logging.info(f"Creating world datapacks folder {self.w_dir}")
         os.mkdir(f"{self.w_dir}/datapacks")
 
     def create_level_dat(self, gamerules: dict, difficulty: int,
@@ -72,7 +76,8 @@ class WorldCreator:
             and buffet terrain generators. If the parameter generator is neither
             "buffet" nor "flat", this parameter is ignored.
         """
-        world_level_dat = os.sep.join([self.w_dir, "level.dat"])
+        world_level_dat = f"{self.w_dir}/level.dat"
+        logging.info(f"Starting creation of level.dat in '{world_level_dat}'")
         mc = "minecraft:"
         level_dat_dict = {
             "Version": {
@@ -104,6 +109,7 @@ class WorldCreator:
             "BorderWarningTime": float(border_settings.get("warn_time"))
         }
         if mu.GeneratorNames(generator) == mu.GeneratorNames.BUFFET:
+            logging.info("Adding buffet options")
             generator_options_dict = {
                 "biome_source": {
                     "type": mc + generator_opts.get("buffet_biome_type"),
@@ -124,12 +130,14 @@ class WorldCreator:
             }
             level_dat_dict["generatorOptions"] = generator_options_dict
         elif mu.GeneratorNames(generator) == mu.GeneratorNames.FLAT:
+            logging.info("Adding superflat options")
             generator_layers = []
             for layer in generator_opts.get("flat_layers"):
                 generator_layers.append({
                     "block": mc + layer[1],
                     "height": str(layer[0])
                 })
+            logging.info(f"Added {len(generator_layers)} layers to the world")
             generator_options_dict = {
                 "biome": mc + generator_opts.get("flat_biome"),
                 "layers": generator_layers,
@@ -137,5 +145,7 @@ class WorldCreator:
             }
             level_dat_dict["generatorOptions"] = generator_options_dict
 
+        logging.info("Parsing NBT tags")
         level_file = LevelFile.from_arguments(level_dat_dict)
+        logging.info("Creating level.dat file")
         level_file.save(filename=world_level_dat)

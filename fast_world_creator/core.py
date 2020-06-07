@@ -1,3 +1,4 @@
+import logging
 import random
 from typing import Generator, List
 
@@ -42,9 +43,13 @@ def run(version: str, world_name: str, seed: int, datapacks: List[Datapack],
     if datapacks:
         wc.create_datapack_directory()
         for d in datapacks:
+            logging.info(f"Creating datapack '{d.name}'")
             created = d.create_datapack_files(seed=wc.seed, version=version)
             if created:
                 created_datapacks.append(d.name)
+                yield
+            else:
+                logging.warning(f"Failed to create '{d.name}'")
                 yield
     wc.create_level_dat(
         datapack_list=created_datapacks,
