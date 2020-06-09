@@ -10,7 +10,7 @@ class ExternalDatapack(Datapack):
         super().__init__()
         self.name = path.split("/")[-1].rstrip(".zip")
         self.path = path
-        self.description = "Found in assets/imported_datapacks"
+        self.description = "Found in assets/datapacks"
 
     def store(self) -> None:
         """ Copy the existing datapack zip to the datapacks folder."""

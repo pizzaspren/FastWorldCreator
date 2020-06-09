@@ -66,7 +66,7 @@ def create_layouts():
 
         Contains most common Minecraft options such as version, world name,
         seed, game mode and difficulty. Datapack selection is bundled in the
-        main tab, and populated from the assets/imported_datapacks folder.
+        main tab, and populated from the assets/datapacks folder.
         """
         logging.debug("Creating main tab layout")
         layout = [[
@@ -276,7 +276,7 @@ def create_layouts():
                 sg.T("Z"), sg.I("0", (19, 1), key="border_z"),
             ]])
         ]]
-        layout += [[
+        col1_layout = [[
             sg.Frame("Border size", [
                 [
                     sg.T("Initial size", (8, 1)),
@@ -296,27 +296,26 @@ def create_layouts():
                 ]
             ])
         ]]
+        col2_layout = [[
+            sg.T("Damage", (11, 1), tooltip="Damage per block"),
+            sg.Spin([str(x / 10) for x in range(201)], "0.2", size=(7, 1),
+                    key="border_damage")
+        ]]
+        col2_layout += [[
+            sg.T("Safe distance", (11, 1), tooltip="Blocks beyond border"),
+            sg.I("5", (8, 1), justification="right", key="border_safe_blocks")
+        ]]
+        col2_layout += [[
+            sg.T("Warning time", (11, 1)),
+            sg.I("15", (8, 1), justification="right", key="border_warn_time")
+        ]]
+        col2_layout += [[
+            sg.T("Warning blocks", (11, 1)),
+            sg.I("5", (8, 1), justification="right", key="border_warn_blocks")
+        ]]
         layout += [[
-            sg.Frame("Warning zone", [
-                [
-                    sg.T("Damage per block", (15, 1)),
-                    sg.Spin([str(x / 10) for x in range(201)], "0.2",
-                            size=(10, 1), key="border_damage")
-
-                ],
-                [
-                    sg.T("Safe distance", (15, 1)),
-                    sg.I("5", (11, 1), key="border_safe_blocks")
-                ],
-                [
-                    sg.T("Warning time", (15, 1)),
-                    sg.I("15", (11, 1), key="border_warn_time")
-                ],
-                [
-                    sg.T("Warning distance", (15, 1)),
-                    sg.I("5", (11, 1), key="border_warn_blocks")
-                ]
-            ])
+            sg.Col(col2_layout, pad=(0, 0)),
+            sg.Col(col1_layout, pad=(0, 0))
         ]]
         return layout
 
