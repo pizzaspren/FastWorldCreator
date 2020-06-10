@@ -44,12 +44,12 @@ def ui_from_key(cls: Type[sg.Element], key: str, fallback: object,
     default_val = ui_defaults.get(key, fallback)
     if cls in [sg.Combo, sg.Slider]:
         return cls(default_value=default_val, key=key, **kwargs)
-    elif cls == sg.I:
+    if cls == sg.I:
         return cls(default_text=default_val, key=key, **kwargs)
-    elif cls == sg.Spin:
+    if cls == sg.Spin:
         return cls(initial_value=default_val, key=key, **kwargs)
-    else:
-        return cls(default=default_val, key=key, **kwargs)
+
+    return cls(default=default_val, key=key, **kwargs)
 
 
 def get_default_ui_values() -> dict:
