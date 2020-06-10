@@ -49,8 +49,6 @@ def ui_from_key(cls: Type[sg.Element], key: str, fallback: object,
     elif cls == sg.Spin:
         return cls(initial_value=default_val, key=key, **kwargs)
     else:
-        if cls == sg.CB:
-            default_val = bool(default_val)
         return cls(default=default_val, key=key, **kwargs)
 
 
