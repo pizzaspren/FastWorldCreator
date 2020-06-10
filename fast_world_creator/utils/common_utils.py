@@ -2,14 +2,16 @@ import logging
 import os
 from configparser import ConfigParser
 from functools import lru_cache
-from typing import Dict
+from typing import Dict, Type
+
+import PySimpleGUI as sg
 
 from fast_world_creator.utils import minecraft_utils as mu
 
 MC_FOLDER = f"{os.getenv('APPDATA')}/.minecraft"
 
 
-def get_or_create_config():
+def get_or_create_config() -> ConfigParser:
     """ Read the configuration file, or create it if not present.
 
     :return: The program configuration values.
@@ -26,6 +28,62 @@ def get_or_create_config():
         with open("config.ini", "w") as config_file:
             cfg.write(config_file)
     return cfg
+
+
+def ui_from_key(cls: Type[sg.Element], key: str, fallback: object,
+                ui_defaults: dict, **kwargs: dict) -> sg.Element:
+    """ Create a PySimpleGUI widget with the default value in a dict.
+
+    :param cls: The class of the widget.
+    :param key: The key to assign the widget.
+    :param fallback: The default value if the key is not found in the dict.
+    :param ui_defaults: The dict to extract the default value from.
+    :param kwargs: Other arguments for the widget
+    :return: The instantiated PySimpleGUI widget.
+    """
+    default_val = ui_defaults.get(key, fallback)
+    if cls in [sg.Combo, sg.Slider]:
+        return cls(default_value=default_val, key=key, **kwargs)
+    elif cls == sg.I:
+        return cls(default_text=default_val, key=key, **kwargs)
+    elif cls == sg.Spin:
+        return cls(initial_value=default_val, key=key, **kwargs)
+    else:
+        if cls == sg.CB:
+            default_val = bool(default_val)
+        return cls(default=default_val, key=key, **kwargs)
+
+
+def get_default_ui_values() -> dict:
+    """ Read the configuration file for the default UI values.
+
+    :return: The default values for the UI elements.
+    """
+    cfg = ConfigParser()
+    cfg.read('defaults.ini')
+    cfg_dict = {}
+    for section in cfg.sections():
+        prefix = f"{section.lower()}_" if section in ["BUFFET", "BUFFET_BIOME",
+                                                      "FLAT", "BORDER"] else ""
+        for item in list(cfg[section].keys()):
+            if section == "BUFFET_BIOME":
+                cfg_dict[prefix + item] = cfg.getboolean(section, item) or False
+            else:
+                cfg_dict[prefix + item] = cfg.get(section, item) or ""
+
+    versions = cfg.getboolean("MAIN", "installed_versions")
+    cfg_dict["radio_installed_versions"] = versions
+    cfg_dict["radio_all_versions"] = not versions
+
+    weather = cfg.get("MAIN", "weather")
+    cfg_dict["rain"] = weather.lower() in ["rain", "raining"]
+    cfg_dict["thundering"] = weather.lower() in ["thunder", "thundering"]
+    cfg_dict["clear"] = not (cfg_dict["rain"] or cfg_dict["thundering"])
+
+    cfg_dict["buffet_fluid_lava"] = (cfg_dict["buffet_fluid"] == "lava")
+    cfg_dict["buffet_fluid_water"] = not cfg_dict["buffet_fluid_lava"]
+
+    return cfg_dict
 
 
 @lru_cache(maxsize=4)

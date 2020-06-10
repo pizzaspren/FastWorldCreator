@@ -1,3 +1,4 @@
+import functools
 import logging
 from enum import Enum
 from functools import partial
@@ -12,6 +13,8 @@ from fast_world_creator.utils import minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
 
 config = cu.get_or_create_config()
+ui_defaults = cu.get_default_ui_values()
+ufk = functools.partial(cu.ui_from_key, ui_defaults=ui_defaults)
 
 log_format = "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s"
 logging.basicConfig(filename=config.get("LOGGING", "file"),
@@ -36,9 +39,9 @@ def enum_to_cb_contents(cls: Type[Enum]) -> List[str]:
     return [e.name.title() for e in cls]
 
 
-supported_mc_versions = [k for k in mu.version_map]
-installed_mc_versions = [k for k in cu.find_installed_minecraft_versions()]
-installed_mc_versions.sort(reverse=True)
+supported_versions = [k for k in mu.version_map]
+installed_versions = [k for k in cu.find_installed_minecraft_versions()]
+installed_versions.sort(reverse=True)
 available_datapacks = du.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
 difficulties = enum_to_cb_contents(mu.Difficulties)
@@ -73,15 +76,19 @@ def create_layouts():
             sg.Frame("Version", [
                 [
                     sg.T('Minecraft Version', size=(15, 1)),
-                    sg.Combo(installed_mc_versions, installed_mc_versions[0],
-                             (25, 1), readonly=True, key="release")
+                    ufk(sg.Combo, "release", installed_versions[0],
+                        values=installed_versions if ui_defaults[
+                            "radio_installed_versions"] else supported_versions,
+                        size=(25, 1),
+                        readonly=True)
                 ],
                 [
-                    sg.Radio("Show installed versions", "radio_versions", True,
-                             enable_events=True,
-                             key="radio_installed_versions"),
-                    sg.Radio("Show all versions", "radio_versions",
-                             enable_events=True, key="radio_all_versions")
+                    ufk(sg.Radio, "radio_installed_versions", True,
+                        text="Show installed versions",
+                        group_id="radio_versions", enable_events=True),
+                    ufk(sg.Radio, "radio_all_versions", False,
+                        text="Show all versions", group_id="radio_versions",
+                        enable_events=True)
                 ]
             ])
         ]]
@@ -90,19 +97,19 @@ def create_layouts():
             sg.I(size=(21, 1), key="name")
         ]]
         c1_layout += [[
-            sg.T('Seed', size=(10, 1), tooltip="Leave blank for random seed"),
-            sg.I(size=(21, 1), tooltip="Leave blank for random seed",
-                 key="seed")
+            sg.T('Difficulty', size=(10, 1)),
+            ufk(sg.Combo, "difficulty", difficulties[0], size=(19, 1),
+                values=difficulties, readonly=True)
         ]]
         c1_layout += [[
-            sg.T('Difficulty', size=(10, 1)),
-            sg.Combo(difficulties, difficulties[0], (19, 1), readonly=True,
-                     key="difficulty")
+            sg.T('Seed', size=(10, 1), tooltip="Leave blank for random seed"),
+            ufk(sg.I, "seed", "", size=(21, 1),
+                tooltip="Leave blank for random seed")
         ]]
         c1_layout += [[
             sg.T('Game mode', size=(10, 1)),
-            sg.Combo(game_modes, game_modes[0], (19, 1), readonly=True,
-                     key="game_mode")
+            ufk(sg.Combo, "game_mode", game_modes[0], values=game_modes,
+                size=(19, 1), readonly=True)
         ]]
         c2_layout = [[sg.Frame('Weather', create_weather_layout())]]
         layout += [[
@@ -120,9 +127,10 @@ def create_layouts():
         """
         logging.debug("Creating weather layout")
         layout = [
-            [sg.Radio("Clear", "weather", True)],
-            [sg.Radio("Rain", "weather", key="rain")],
-            [sg.Radio("Thunder", "weather", key="thundering")]
+            [ufk(sg.Radio, "clear", True, text="Clear", group_id="weather")],
+            [ufk(sg.Radio, "rain", False, text="Rain", group_id="weather")],
+            [ufk(sg.Radio, "thundering", False, text="Thunder",
+                 group_id="weather")]
         ]
         return layout
 
@@ -142,9 +150,9 @@ def create_layouts():
         c1_layout, c2_layout = sg.Sizer(20, 1), sg.Sizer(20, 1)
         for d_pair in grouped_packs:
             for d, c in zip(d_pair, [c1_layout, c2_layout]):
-                c.add_row(sg.CB(d.name, d.default_enabled, (15, 1),
-                                tooltip=f"{d.name}\n{d.description}",
-                                key=d.name))
+                c.add_row(ufk(sg.CB, d.name, d.default_enabled, text=d.name,
+                              size=(15, 1),
+                              tooltip=f"{d.name}\n{d.description}"))
         return [[c1_layout, c2_layout]]
 
     def create_gamerule_layout():
@@ -163,9 +171,11 @@ def create_layouts():
                 sg.Text(gr, (25, 1))
             )
             if isinstance(gamerules.get(gr), bool):
-                col2.add_row(sg.CB("", gamerules.get(gr), key=gr))
+                col2.add_row(sg.CB("", ui_defaults.get(gr, gamerules.get(gr)),
+                                   key=gr))
             else:
-                col2.add_row(sg.I(gamerules.get(gr), (10, 1), key=gr))
+                col2.add_row(sg.I(ui_defaults.get(gr, gamerules.get(gr)),
+                                  (10, 1), key=gr))
             grouped.add_row(col1, col2)
         return [[grouped]]
 
@@ -179,9 +189,9 @@ def create_layouts():
         layout = []
         layout += [[
             sg.T("World type", (16, 1), pad=(10, 10)),
-            sg.Combo(generators, mu.GeneratorNames.DEFAULT.value.title(),
-                     (25, 1), pad=(3, 10), readonly=True, enable_events=True,
-                     key="generator")
+            ufk(sg.Combo, "generator", mu.GeneratorNames.DEFAULT.value.title(),
+                values=generators, size=(25, 1), pad=(3, 10), readonly=True,
+                enable_events=True)
         ]]
         layout += [[sg.Frame('Buffet options', create_buffet_options(),
                              key='buffet_option_frame')]]
@@ -200,37 +210,41 @@ def create_layouts():
         logging.debug("Creating buffet layout")
         layout = [[
             sg.T("Chunk generator", (15, 1)),
-            sg.Combo(chunk_generator_types, chunk_generator_types[0],
-                     (25, 1), readonly=True, enable_events=True,
-                     key="buffet_chunk_type")
+            ufk(sg.Combo, "buffet_chunk_type", chunk_generator_types[0],
+                values=chunk_generator_types, size=(25, 1), readonly=True,
+                enable_events=True)
         ]]
         layout += [[
             sg.T("Default block", (15, 1)),
-            sg.Combo(blocks, "stone", (25, 1), key="buffet_block")
+            ufk(sg.Combo, "buffet_block", "stone", values=blocks, size=(25, 1))
         ]]
         layout += [[
             sg.T("Default fluid", (15, 1)),
-            sg.Radio("Water", "buffet_fluid", True, key="buffet_fluid"),
-            sg.Radio("Lava", "buffet_fluid")
+            ufk(sg.Radio, "buffet_fluid_water", True, text="Water",
+                group_id="buffet_fluid"),
+            ufk(sg.Radio, "buffet_fluid_lava", False, text="Lava",
+                group_id="buffet_fluid")
         ]]
         layout += [[sg.Text("┈" * 46)]]
         layout += [[
             sg.T("Biomes distribution", (15, 1)),
-            sg.Combo(buffet_biome_types, buffet_biome_types[0], (25, 1),
-                     readonly=True, enable_events=True, key="buffet_biome_type")
+            ufk(sg.Combo, "buffet_biome_type", buffet_biome_types[0],
+                values=buffet_biome_types, size=(25, 1), readonly=True,
+                enable_events=True)
         ]]
         layout += [[
             sg.T("Checkerboard size", (15, 1)),
-            sg.Slider((-4, 16), 2, orientation='h', tooltip="".join([
-                "The biome squares will have sides of 2^size chunks.\n",
-                "  -4 = 1 block\n  16 = 65536 chunks"]),
-                      key="buffet_size")
+            ufk(sg.Slider, "buffet_size", 2, range=(-4, 16), orientation='h',
+                tooltip="".join([
+                    "The biome squares will have sides of 2^size chunks.\n",
+                    "  -4 = 1 block\n  16 = 65536 chunks"]))
         ]]
         layout += [[
             sg.T("Biomes", (15, 1)),
-            sg.Col([[sg.CB(b, key=f"buffet_biome_{b}")] for b in biomes],
-                   size=(175, 125), pad=(5, 5), scrollable=True,
-                   vertical_scroll_only=True, key="buffet_biomes")
+            sg.Col([
+                [ufk(sg.CB, f"buffet_biome_{b}", False, text=b)] for b in
+                biomes], size=(175, 125), pad=(5, 5), scrollable=True,
+                vertical_scroll_only=True, key="buffet_biomes")
         ]]
         return layout
 
@@ -244,22 +258,22 @@ def create_layouts():
         layout = []
         layout += [[
             sg.T("Presets", (15, 1)),
-            sg.Combo(list(superflat_dict.keys()), superflat_presets[0][0],
-                     size=(25, 1), readonly=True, enable_events=True,
-                     key="flat_preset")
+            ufk(sg.Combo, "flat_preset", superflat_presets[0][0],
+                values=list(superflat_dict.keys()), size=(25, 1), readonly=True,
+                enable_events=True)
         ]]
         layout += [[
             sg.T("Biome", (15, 1)),
-            sg.Combo(biomes, superflat_presets[0][2], (25, 1), readonly=True,
-                     key="flat_biome")
+            ufk(sg.Combo, "flat_biome", superflat_presets[0][2], values=biomes,
+                size=(25, 1), readonly=True)
         ]]
         layout += [[
             sg.T("Layers", (15, 1)),
-            sg.I(superflat_presets[0][1], (27, 1), key="flat_layers")
+            ufk(sg.I, "flat_layers", superflat_presets[0][1], size=(27, 1))
         ]]
         layout += [[
             sg.T("Structure flags", (15, 1)),
-            sg.I(superflat_presets[0][3], (27, 1), key="flat_structures")
+            ufk(sg.I, "flat_structures", superflat_presets[0][3], size=(27, 1))
         ]]
         return layout
 
@@ -272,46 +286,49 @@ def create_layouts():
         logging.debug("Creating world border layout")
         layout = [[
             sg.Frame("Border center", [[
-                sg.T("X"), sg.I("0", (19, 1), key="border_x"),
-                sg.T("Z"), sg.I("0", (19, 1), key="border_z"),
+                sg.T("X"), ufk(sg.I, "border_x", 0, size=(19, 1)),
+                sg.T("Z"), ufk(sg.I, "border_z", 0, size=(19, 1)),
             ]])
         ]]
         col1_layout = [[
             sg.Frame("Border size", [
                 [
                     sg.T("Initial size", (8, 1)),
-                    sg.I("60000000", (10, 1), justification="right",
-                         key="border_size")
+                    ufk(sg.I, "border_size", "60000000", size=(10, 1),
+                        justification="right")
                 ],
                 [
                     sg.T("Final size", (8, 1)),
-                    sg.I("60000000", (10, 1), justification="right",
-                         key="border_size_target")
+                    ufk(sg.I, "border_size_target", "60000000", size=(10, 1),
+                        justification="right")
                 ],
                 [
                     sg.T("Lerp time", (8, 1),
                          tooltip="Seconds until border reaches final size"),
-                    sg.I("0", (10, 1), justification="right",
-                         key="border_lerp_time")
+                    ufk(sg.I, "border_lerp_time", "0", size=(10, 1),
+                        justification="right")
                 ]
             ])
         ]]
         col2_layout = [[
             sg.T("Damage", (11, 1), tooltip="Damage per block"),
-            sg.Spin([str(x / 10) for x in range(201)], "0.2", size=(7, 1),
-                    key="border_damage")
+            ufk(sg.Spin, "border_damage", "0.2",
+                values=[str(x / 10) for x in range(201)], size=(7, 1))
         ]]
         col2_layout += [[
             sg.T("Safe distance", (11, 1), tooltip="Blocks beyond border"),
-            sg.I("5", (8, 1), justification="right", key="border_safe_blocks")
+            ufk(sg.I, "border_safe_blocks", "5", size=(8, 1),
+                justification="right")
         ]]
         col2_layout += [[
             sg.T("Warning time", (11, 1)),
-            sg.I("15", (8, 1), justification="right", key="border_warn_time")
+            ufk(sg.I, "border_warn_time", "15", size=(8, 1),
+                justification="right")
         ]]
         col2_layout += [[
             sg.T("Warning blocks", (11, 1)),
-            sg.I("5", (8, 1), justification="right", key="border_warn_blocks")
+            ufk(sg.I, "border_warn_blocks", "5", size=(8, 1),
+                justification="right")
         ]]
         layout += [[
             sg.Col(col2_layout, pad=(0, 0)),
@@ -355,7 +372,7 @@ def parse_generator_options(values: dict) -> dict:
         "buffet_biomes": [b for b in biomes if values[f"buffet_biome_{b}"]],
         "buffet_size": int(values.get("buffet_size")),
         "buffet_block": values.get('buffet_block'),
-        "buffet_fluid": "water" if values.get('buffet_fluid') else "lava",
+        "buffet_fluid": "water" if values.get('buffet_fluid_water') else "lava",
         "buffet_chunk_type": values.get("buffet_chunk_type").lower(),
 
         "flat_biome": values.get('flat_biome'),
@@ -433,9 +450,9 @@ while True:
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel
         break
     if event == "radio_installed_versions":
-        window["release"].update(values=installed_mc_versions)
+        window["release"].update(values=installed_versions)
     elif event == "radio_all_versions":
-        window["release"].update(values=supported_mc_versions)
+        window["release"].update(values=supported_versions)
     if event == "generator":
         if val_dict[event] == mu.GeneratorNames.BUFFET.name.title():
             window["buffet_option_frame"].unhide_row()
