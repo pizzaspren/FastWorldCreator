@@ -6,7 +6,6 @@ from typing import Dict, List, Union
 
 from fast_world_creator.datapacks.external_datapack import ExternalDatapack
 from fast_world_creator.datapacks.random_loot import RandomLootDataPack
-
 from fast_world_creator.utils import minecraft_utils as mu
 
 MC_FOLDER = f"{os.getenv('APPDATA')}/.minecraft"
@@ -110,7 +109,7 @@ def change_directory(to_dir: str) -> str:
 
 
 def get_available_datapacks() -> List[
-        Union[RandomLootDataPack, ExternalDatapack]]:
+    Union[RandomLootDataPack, ExternalDatapack]]:
     """ Get a list of the datapacks that can be added to a world.
 
     Reads the zip files available in the assets/datapacks folder and

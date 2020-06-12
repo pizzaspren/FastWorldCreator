@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from nbtlib import tag, schema, nbt, parse_nbt, InvalidLiteral
+from nbtlib import tag, schema, nbt, parse_nbt
 
 from fast_world_creator.utils.level_dat_utils import get_template_dict
 
