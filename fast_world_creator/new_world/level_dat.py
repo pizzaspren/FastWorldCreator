@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 import json
 
-from nbtlib import tag, schema, nbt, parse_nbt
+from nbtlib import tag, schema, nbt, parse_nbt, InvalidLiteral
 
 from fast_world_creator.utils.level_dat_utils import get_template_dict
 
@@ -108,7 +109,8 @@ level_data_dict = {
     'GameRules': tag.Compound,
     'GameType': tag.Int,
     'generatorName': tag.String,
-    'generatorOptions': schema('generatorOptions', generator_options_dict, strict=True),
+    'generatorOptions': schema('generatorOptions', generator_options_dict,
+                               strict=True),
     'generatorVersion': tag.Int,
     'hardcore': tag.Byte,
     'initialized': tag.Byte,

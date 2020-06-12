@@ -2,9 +2,10 @@ import logging
 import os
 from configparser import ConfigParser
 from functools import lru_cache
-from typing import Dict, Type
+from typing import Dict, List, Union
 
-import PySimpleGUI as sg
+from fast_world_creator.datapacks.external_datapack import ExternalDatapack
+from fast_world_creator.datapacks.random_loot import RandomLootDataPack
 
 from fast_world_creator.utils import minecraft_utils as mu
 
@@ -28,28 +29,6 @@ def get_or_create_config() -> ConfigParser:
         with open("config.ini", "w") as config_file:
             cfg.write(config_file)
     return cfg
-
-
-def ui_from_key(cls: Type[sg.Element], key: str, fallback: object,
-                ui_defaults: dict, **kwargs: dict) -> sg.Element:
-    """ Create a PySimpleGUI widget with the default value in a dict.
-
-    :param cls: The class of the widget.
-    :param key: The key to assign the widget.
-    :param fallback: The default value if the key is not found in the dict.
-    :param ui_defaults: The dict to extract the default value from.
-    :param kwargs: Other arguments for the widget
-    :return: The instantiated PySimpleGUI widget.
-    """
-    default_val = ui_defaults.get(key, fallback)
-    if cls in [sg.Combo, sg.Slider]:
-        return cls(default_value=default_val, key=key, **kwargs)
-    if cls == sg.I:
-        return cls(default_text=default_val, key=key, **kwargs)
-    if cls == sg.Spin:
-        return cls(initial_value=default_val, key=key, **kwargs)
-
-    return cls(default=default_val, key=key, **kwargs)
 
 
 def get_default_ui_values() -> dict:
@@ -128,3 +107,24 @@ def change_directory(to_dir: str) -> str:
     owd = os.getcwd()
     os.chdir(to_dir)
     return owd
+
+
+def get_available_datapacks() -> List[
+        Union[RandomLootDataPack, ExternalDatapack]]:
+    """ Get a list of the datapacks that can be added to a world.
+
+    Reads the zip files available in the assets/datapacks folder and
+    creates an ExternalDatapack object with their path and name. The external
+    datapacks are then appended after a RandomLootDatapack object, which is
+    built during program runtime.
+
+    :return: A list of the available datapacks.
+    """
+    datapacks = [RandomLootDataPack()]
+    external_datapack_folder = f"{os.getcwd()}/assets/datapacks"
+    for z in os.listdir(external_datapack_folder):
+        if z.endswith(".zip"):
+            dp = ExternalDatapack(f"{external_datapack_folder}/{z}")
+            datapacks.append(dp)
+    logging.info(f"Found {len(datapacks)} available datapacks")
+    return datapacks
