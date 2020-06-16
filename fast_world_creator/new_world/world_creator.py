@@ -92,7 +92,7 @@ class WorldCreator:
             },
             "Difficulty": min(difficulty, 3),
             "hardcore": int(mu.Difficulties(difficulty).is_hardcore()),
-            "generatorName": generator,
+            "generatorName": generator.lower(),
             "GameRules": gamerules,
             "GameType": game_mode,
             "raining": True if thundering else raining,
@@ -108,7 +108,7 @@ class WorldCreator:
             "BorderWarningBlocks": float(border_settings.get("warn_blocks")),
             "BorderWarningTime": float(border_settings.get("warn_time"))
         }
-        if mu.GeneratorNames(generator) == mu.GeneratorNames.BUFFET:
+        if generator == "buffet":
             logging.info("Adding buffet options")
             generator_options_dict = {
                 "biome_source": {
@@ -129,7 +129,7 @@ class WorldCreator:
                 }
             }
             level_dat_dict["generatorOptions"] = generator_options_dict
-        elif mu.GeneratorNames(generator) == mu.GeneratorNames.FLAT:
+        elif generator == "flat":
             logging.info("Adding superflat options")
             generator_layers = []
             for layer in generator_opts.get("flat_layers"):

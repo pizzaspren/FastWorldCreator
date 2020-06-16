@@ -6,12 +6,13 @@ from typing import List, Type, Generator, Union
 import PySimpleGUI as sg
 
 from fast_world_creator import core
-from fast_world_creator.utils import common_utils as cu
-from fast_world_creator.utils import minecraft_utils as mu
+from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
 
+from fast_world_creator.ui import window
+
 config = cu.get_or_create_config()
-ui_defaults = cu.get_default_ui_values()
+ui_defaults = cu.get_default_ui_values(config.get("UI", "template_file"))
 
 log_format = "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s"
 logging.basicConfig(filename=config.get("LOGGING", "file"), format=log_format,
@@ -35,345 +36,12 @@ def enum_to_cb_contents(cls: Type[Enum]) -> List[str]:
     return [e.name.title() for e in cls]
 
 
-def ui_from_key(cls: Type[sg.Element], key: str, fallback: object,
-                **kwargs) -> sg.Element:
-    """ Create a PySimpleGUI widget with the default value in a dict.
-
-    :param cls: The class of the widget.
-    :param key: The key to assign the widget.
-    :param fallback: The default value if the key is not found in the dict.
-    :param kwargs: Other arguments for the widget
-    :return: The instantiated PySimpleGUI widget.
-    """
-    default_val = ui_defaults.get(key, fallback)
-    if cls in [sg.Combo, sg.Slider]:
-        return cls(default_value=default_val, key=key, **kwargs)
-    if cls == sg.I:
-        return cls(default_text=default_val, key=key, **kwargs)
-    if cls == sg.Spin:
-        return cls(initial_value=default_val, key=key, **kwargs)
-
-    return cls(default=default_val, key=key, **kwargs)
-
-
-supported_versions = [k for k in mu.version_map]
-installed_versions = [k for k in cu.find_installed_minecraft_versions()]
-installed_versions.sort(reverse=True)
 available_datapacks = cu.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
 difficulties = enum_to_cb_contents(mu.Difficulties)
 game_modes = enum_to_cb_contents(mu.GameModes)
-generators = enum_to_cb_contents(mu.GeneratorNames)
-generators.sort()
-buffet_biome_types = enum_to_cb_contents(mu.BuffetOpts.BType)
-chunk_generator_types = enum_to_cb_contents(mu.BuffetOpts.BChunkGen)
 biomes = mu.get_mc_definitions("biomes")
-blocks = mu.get_mc_definitions("blocks")
-superflat_presets = [p.split(";") for p in
-                     mu.get_mc_definitions("superflat_presets")]
-superflat_dict = {preset[0]: preset[1:] for preset in superflat_presets}
-SF_BLOCK, SF_BIOME, SF_STRUCT = range(0, 3)
 gamerules = get_default_gamerules()
-
-
-def create_layouts():
-    """Create all the layouts for the GUI window."""
-
-    def create_main_tab_layout():
-        """Create layout for the main tab.
-
-        Contains most common Minecraft options such as version, world name,
-        seed, game mode and difficulty. Datapack selection is bundled in the
-        main tab, and populated from the assets/datapacks folder.
-        """
-        logging.debug("Creating main tab layout")
-        layout = [[
-            sg.Frame("Version", [
-                [
-                    sg.T('Minecraft Version', size=(15, 1)),
-                    ui_from_key(sg.Combo, "release", installed_versions[0],
-                                values=installed_versions
-                                if ui_defaults["radio_installed_versions"]
-                                else supported_versions, size=(25, 1),
-                                readonly=True)
-                ],
-                [
-                    ui_from_key(sg.Radio, "radio_installed_versions", True,
-                                text="Show installed versions",
-                                group_id="radio_versions", enable_events=True),
-                    ui_from_key(sg.Radio, "radio_all_versions", False,
-                                text="Show all versions",
-                                group_id="radio_versions", enable_events=True)
-                ]
-            ])
-        ]]
-        c1_layout = [[
-            sg.T('World Name', size=(10, 1)),
-            sg.I(size=(21, 1), key="name")
-        ]]
-        c1_layout += [[
-            sg.T('Seed', size=(10, 1), tooltip="Leave blank for random seed"),
-            ui_from_key(sg.I, "seed", "", size=(21, 1),
-                        tooltip="Leave blank for random seed")
-        ]]
-        c1_layout += [[
-            sg.T('Difficulty', size=(10, 1)),
-            ui_from_key(sg.Combo, "difficulty", difficulties[0], size=(19, 1),
-                        values=difficulties, readonly=True)
-        ]]
-        c1_layout += [[
-            sg.T('Game mode', size=(10, 1)),
-            ui_from_key(sg.Combo, "game_mode", game_modes[0], values=game_modes,
-                        size=(19, 1), readonly=True)
-        ]]
-        c2_layout = [[sg.Frame('Weather', create_weather_layout())]]
-        layout += [[
-            sg.Col(c1_layout, pad=(0, 5)), sg.Col(c2_layout, pad=(0, 0))
-        ]]
-        layout += [[
-            sg.Frame('Datapacks', create_datapack_layout(), size=(50, 1))
-        ]]
-        return layout
-
-    def create_weather_layout():
-        """Create layout for the weather frame.
-
-        Contains selection for rain/clear/thundering weather.
-        """
-        logging.debug("Creating weather layout")
-        layout = [
-            [ui_from_key(sg.Radio, "clear", True, text="Clear",
-                         group_id="weather")],
-            [ui_from_key(sg.Radio, "rain", False, text="Rain",
-                         group_id="weather")],
-            [ui_from_key(sg.Radio, "thundering", False, text="Thunder",
-                         group_id="weather")]
-        ]
-        return layout
-
-    def create_datapack_layout():
-        """Create layout for the datapack frame.
-
-        Groups all the available datapacks in two columns. Each datapack can be
-        selected with a Checkbox, which has a default state equal to the
-        datapack's 'default_enabled' field.
-        """
-        logging.debug("Creating datapack layout")
-        grouped_packs = [
-            available_datapacks[i:i + 2] for i in
-            range(0, len(available_datapacks), 2)
-        ]
-        logging.debug(f"Found {len(grouped_packs)} pairs of datapacks")
-        c1_layout, c2_layout = sg.Sizer(20, 1), sg.Sizer(20, 1)
-        for d_pair in grouped_packs:
-            for d, c in zip(d_pair, [c1_layout, c2_layout]):
-                c.add_row(ui_from_key(sg.CB, d.name, d.default_enabled,
-                                      text=d.name, size=(15, 1),
-                                      tooltip=f"{d.name}\n{d.description}"))
-        return [[c1_layout, c2_layout]]
-
-    def create_gamerule_layout():
-        """Create layout for the gamerules tab.
-
-        Contains all the gamerules available for the game, grouped into a single
-        column. The gamerules with a boolean value are assigned a CheckBox, and
-        the gamerules with an integer value are assigned an Input element
-        """
-        logging.debug("Creating gamerule layout")
-        grouped = sg.Column([[]], scrollable=True, vertical_scroll_only=True)
-        for gr in gamerules.keys():
-            col1, col2 = sg.Sizer(20, 1), sg.Sizer(15, 1)
-            col2.ElementJustification = "right"
-            col1.add_row(
-                sg.Text(gr, (25, 1))
-            )
-            if isinstance(gamerules.get(gr), bool):
-                col2.add_row(sg.CB("", ui_defaults.get(gr, gamerules.get(gr)),
-                                   key=gr))
-            else:
-                col2.add_row(sg.I(ui_defaults.get(gr, gamerules.get(gr)),
-                                  (10, 1), key=gr))
-            grouped.add_row(col1, col2)
-        return [[grouped]]
-
-    def create_terrain_layout():
-        """Create layout for the terrain tab.
-
-        Contains all the options for the different terrain generators available
-        in the game (1.13 until pre-20w21a).
-        """
-        logging.debug("Creating terrain layout")
-        layout = []
-        layout += [[
-            sg.T("World type", (16, 1), pad=(10, 10)),
-            ui_from_key(sg.Combo, "generator",
-                        mu.GeneratorNames.DEFAULT.value.title(),
-                        values=generators, size=(25, 1), pad=(3, 10),
-                        readonly=True, enable_events=True)
-        ]]
-        layout += [[sg.Frame('Buffet options', create_buffet_options(),
-                             key='buffet_option_frame')]]
-        layout += [[sg.Frame('Superflat options', create_superflat_options(),
-                             key='flat_option_frame')]]
-        return layout
-
-    def create_buffet_options():
-        """Create layout for the buffet frame.
-
-        Being the most complex generator in the game, the buffet terrain
-        generator offers a lot of customization options. The data is pulled from
-        the assets folder and put into fields that can be easily differentiated
-        by the users.
-        """
-        logging.debug("Creating buffet layout")
-        layout = [[
-            sg.T("Chunk generator", (15, 1)),
-            ui_from_key(sg.Combo, "buffet_chunk_type", chunk_generator_types[0],
-                        values=chunk_generator_types, size=(25, 1),
-                        readonly=True, enable_events=True)
-        ]]
-        layout += [[
-            sg.T("Default block", (15, 1)),
-            ui_from_key(sg.Combo, "buffet_block", "stone", values=blocks,
-                        size=(25, 1))
-        ]]
-        layout += [[
-            sg.T("Default fluid", (15, 1)),
-            ui_from_key(sg.Radio, "buffet_fluid_water", True, text="Water",
-                        group_id="buffet_fluid"),
-            ui_from_key(sg.Radio, "buffet_fluid_lava", False, text="Lava",
-                        group_id="buffet_fluid")
-        ]]
-        layout += [[sg.Text("┈" * 46)]]
-        layout += [[
-            sg.T("Biomes distribution", (15, 1)),
-            ui_from_key(sg.Combo, "buffet_biome_type", buffet_biome_types[0],
-                        values=buffet_biome_types, size=(25, 1), readonly=True,
-                        enable_events=True)
-        ]]
-        layout += [[
-            sg.T("Checkerboard size", (15, 1)),
-            ui_from_key(sg.Slider, "buffet_size", 2, range=(-4, 16),
-                        orientation='h', tooltip="".join([
-                    "The biome squares will have sides of",
-                    "2^size chunks.\n -4 = 1 block\n",
-                    "16 = 65536 chunks"]))
-        ]]
-        layout += [[
-            sg.T("Biomes", (15, 1)),
-            sg.Col([
-                [ui_from_key(sg.CB, f"buffet_biome_{b}", False, text=b)] for b
-                in biomes], size=(175, 125), pad=(5, 5), scrollable=True,
-                vertical_scroll_only=True, key="buffet_biomes")
-        ]]
-        return layout
-
-    def create_superflat_options():
-        """Create layout for the superflat frame.
-
-        The data is pulled from the assets folder and put into fields that can
-        be easily differentiated by the users.
-        """
-        logging.debug("Creating superflat layout")
-        layout = []
-        layout += [[
-            sg.T("Presets", (15, 1)),
-            ui_from_key(sg.Combo, "flat_preset", superflat_presets[0][0],
-                        values=list(superflat_dict.keys()), size=(25, 1),
-                        readonly=True,
-                        enable_events=True)
-        ]]
-        layout += [[
-            sg.T("Biome", (15, 1)),
-            ui_from_key(sg.Combo, "flat_biome", superflat_presets[0][2],
-                        values=biomes,
-                        size=(25, 1), readonly=True)
-        ]]
-        layout += [[
-            sg.T("Layers", (15, 1)),
-            ui_from_key(sg.I, "flat_layers", superflat_presets[0][1],
-                        size=(27, 1))
-        ]]
-        layout += [[
-            sg.T("Structure flags", (15, 1)),
-            ui_from_key(sg.I, "flat_structures", superflat_presets[0][3],
-                        size=(27, 1))
-        ]]
-        return layout
-
-    def create_border_options():
-        """Create layout for the world border tab.
-
-        Contains all the available options for the modification of the world
-        border.
-        """
-        logging.debug("Creating world border layout")
-        layout = [[
-            sg.Frame("Border center", [[
-                sg.T("X"), ui_from_key(sg.I, "border_x", 0, size=(19, 1)),
-                sg.T("Z"), ui_from_key(sg.I, "border_z", 0, size=(19, 1)),
-            ]])
-        ]]
-        col1_layout = [[
-            sg.Frame("Border size", [
-                [
-                    sg.T("Initial size", (8, 1)),
-                    ui_from_key(sg.I, "border_size", "60000000", size=(10, 1),
-                                justification="right")
-                ],
-                [
-                    sg.T("Final size", (8, 1)),
-                    ui_from_key(sg.I, "border_size_target", "60000000",
-                                size=(10, 1), justification="right")
-                ],
-                [
-                    sg.T("Lerp time", (8, 1),
-                         tooltip="Seconds until border reaches final size"),
-                    ui_from_key(sg.I, "border_lerp_time", "0", size=(10, 1),
-                                justification="right")
-                ]
-            ])
-        ]]
-        col2_layout = [[
-            sg.T("Damage", (11, 1), tooltip="Damage per block"),
-            ui_from_key(sg.Spin, "border_damage", "0.2",
-                        values=[str(x / 10) for x in range(201)], size=(7, 1))
-        ]]
-        col2_layout += [[
-            sg.T("Safe distance", (11, 1), tooltip="Blocks beyond border"),
-            ui_from_key(sg.I, "border_safe_blocks", "5", size=(8, 1),
-                        justification="right")
-        ]]
-        col2_layout += [[
-            sg.T("Warning time", (11, 1)),
-            ui_from_key(sg.I, "border_warn_time", "15", size=(8, 1),
-                        justification="right")
-        ]]
-        col2_layout += [[
-            sg.T("Warning blocks", (11, 1)),
-            ui_from_key(sg.I, "border_warn_blocks", "5", size=(8, 1),
-                        justification="right")
-        ]]
-        layout += [[
-            sg.Col(col2_layout, pad=(0, 0)),
-            sg.Col(col1_layout, pad=(0, 0))
-        ]]
-        return layout
-
-    logging.debug("Creating window tabs")
-    tab1 = sg.Tab("Main", create_main_tab_layout())
-    tab2 = sg.Tab("Gamerules", create_gamerule_layout())
-    tab3 = sg.Tab("Terrain", create_terrain_layout())
-    tab4 = sg.Tab("Border", create_border_options())
-    main_layout = [
-        [sg.TabGroup([[tab1, tab2, tab3, tab4]])],
-        [
-            sg.Button('Ok'), sg.Button('Cancel'),
-            sg.T("", (4, 0)),
-            sg.ProgressBar(100, "horizontal", (20, 23), key="progress_bar")
-        ]
-    ]
-    return main_layout
 
 
 def parse_generator_options(values: dict) -> dict:
@@ -393,7 +61,7 @@ def parse_generator_options(values: dict) -> dict:
     logging.info("Parsing terrain generation options")
     return {
         "buffet_biome_type": values.get("buffet_biome_type").lower(),
-        "buffet_biomes": [b for b in biomes if values[f"buffet_biome_{b}"]],
+        "buffet_biomes": [b for b in biomes if values[f"buffet_biomes_{b}"]],
         "buffet_size": int(values.get("buffet_size")),
         "buffet_block": values.get('buffet_block'),
         "buffet_fluid": "water" if values.get('buffet_fluid_water') else "lava",
@@ -428,27 +96,27 @@ def create(values: dict) -> Generator[Union[str, int], None, None]:
     updated_gamerules = dict()
     for gr in gamerules:
         # Gamerules always stored as strings in level.dat
-        updated_gamerules[gr] = str(values.get(gr)).lower()
+        updated_gamerules[gr] = str(values.get(f"gamerules_{gr}")).lower()
     parse_border_options(values)
-    enabled_dp = [dp for dp in available_datapacks if values[dp.name]]
+    enabled_dp = [dp for dp in available_datapacks if values.get(dp.name, None)]
 
     execution = partial(
         core.run,
-        version=values.get("release"),
-        world_name=values.get("name").replace(" ", "_"),
-        seed=values.get("seed"),
-        difficulty=difficulties.index(values.get("difficulty")),
+        version=values.get("main_release"),
+        world_name=values.get("main_name").replace(" ", "_"),
+        seed=values.get("main_seed"),
+        difficulty=difficulties.index(values.get("main_difficulty")),
         datapacks=enabled_dp,
         gamerules=updated_gamerules,
-        game_mode=game_modes.index(values.get("game_mode")),
-        generator=values.get("generator").lower(),
+        game_mode=game_modes.index(values.get("main_game_mode")),
+        generator=values.get("terrain_generator").lower(),
         generator_options=parse_generator_options(values),
-        raining=values.get("rain"),
-        thundering=values.get("thunder"),
+        raining=values.get("main_rain"),
+        thundering=values.get("main_thunder"),
         border_settings=parse_border_options(values)
     )
     yield "start"
-    # World folder, datapacks, level.dat
+    # World folder, datapacks and level.dat
     total_yields = len(enabled_dp) + 2
     yield_counter = 0
     for _ in execution():
@@ -458,52 +126,15 @@ def create(values: dict) -> Generator[Union[str, int], None, None]:
     yield "done"
 
 
-window = sg.Window(
-    title='Fast world creator',
-    layout=create_layouts(),
-    icon="assets/logo64.ico",
-    finalize=True)
-window["buffet_option_frame"].hide_row()
-window["flat_option_frame"].hide_row()
-window["buffet_size"].hide_row()
-window["border_damage"].Widget.configure(justify="right")
-window["progress_bar"].update(visible=False)
+window = window.FwcWindow(title='Fast world creator', icon="assets/logo64.ico")
+window.create_layouts(game_modes, difficulties, available_datapacks, gamerules,
+                      biomes).finalize()
 
 while True:
     event, val_dict = window.read(1000)
     if event in (None, 'Cancel'):  # if user closes window or clicks cancel
         break
-    if event == "radio_installed_versions":
-        window["release"].update(values=installed_versions)
-    elif event == "radio_all_versions":
-        window["release"].update(values=supported_versions)
-    if event == "generator":
-        if val_dict[event] == mu.GeneratorNames.BUFFET.name.title():
-            window["buffet_option_frame"].unhide_row()
-        else:
-            window["buffet_option_frame"].hide_row()
-        if val_dict[event] == mu.GeneratorNames.FLAT.name.title():
-            window["flat_option_frame"].unhide_row()
-        else:
-            window["flat_option_frame"].hide_row()
-    elif event == "buffet_biome_type":
-        if val_dict[event] == mu.BuffetOpts.BType.VANILLA_LAYERED.name.title():
-            window["buffet_biomes"].hide_row()
-        else:
-            window["buffet_biomes"].unhide_row()
-        if val_dict[event] == mu.BuffetOpts.BType.CHECKERBOARD.name.title():
-            window["buffet_size"].unhide_row()
-        else:
-            window["buffet_size"].hide_row()
-    elif event == "flat_preset":
-        window["flat_biome"].update(
-            value=superflat_dict[val_dict[event]][SF_BIOME])
-        window["flat_layers"].update(
-            value=superflat_dict[val_dict[event]][SF_BLOCK])
-        window["flat_structures"].update(
-            value=superflat_dict[val_dict[event]][SF_STRUCT])
-
-    if event == "Ok":
+    elif event == "Ok":
         for status in create(val_dict):
             window.read(timeout=20)
             if status == "start":
@@ -515,5 +146,7 @@ while True:
                 window["progress_bar"].update(visible=False)
             else:
                 window["progress_bar"].UpdateBar(status)
+    else:
+        window.parse_events(event, val_dict)
 
 window.close()

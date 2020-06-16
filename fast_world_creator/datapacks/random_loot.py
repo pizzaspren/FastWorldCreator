@@ -86,8 +86,6 @@ class RandomLootDataPack(Datapack):
             for filename in filenames:
                 lt_files.append(f"{dirpath}/{filename}")
         lt_file_contents = lt_files.copy()
-        if seed is None:
-            seed = random.randint(0, 1000000)
         logging.info(
             f"Randomizing {len(lt_files)} loot tables with seed = {seed}")
         random.seed(seed)

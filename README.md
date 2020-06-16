@@ -8,15 +8,6 @@
 
 Generate Minecraft worlds with your favourite datapacks in a couple clicks!
 
-<details open>
-  <summary>GUI images (Collapsable)</summary>
-  
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_main.png" width="275">
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_gamerules.png" width="275">
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_terrain.png" width="275">
-  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_border.png" width="275">
-</details>
-
 Tired of copying and pasting your datapacks every time you create a new world? Want to create a multitude of worlds in a very short time? Would you like to create worlds for different versions of Minecraft without even launching the game?
 
 Look no further, this application is just what you need!
@@ -29,6 +20,17 @@ Look no further, this application is just what you need!
 * ...And much more!
 
 *Functionality verified with 1.14.4 and 1.15.2, but should support full releases (not snapshots) from 1.13 onwards.*
+
+### Images
+
+<details open>
+  <summary>Click here to open/close</summary>
+  
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_main.png" width="275">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_gamerules.png" width="275">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_terrain.png" width="275">
+  <img src="https://github.com/pizzaspren/FastWorldCreator/blob/master/.github/images/gui_border.png" width="275">
+</details>
 
 ### Requirements
 Check out the [releases](https://github.com/pizzaspren/FastWorldCreator/releases) page for the executable versions.

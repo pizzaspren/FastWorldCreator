@@ -18,6 +18,9 @@ class Difficulties(enum.IntEnum):
         """
         return self is self.HARDCORE
 
+    def values(self):
+        return [e for e in Difficulties.__members__]
+
 
 class GameModes(enum.IntEnum):
     """ Representation of the game modes in Minecraft. """
@@ -27,34 +30,15 @@ class GameModes(enum.IntEnum):
     SPECTATOR = 3
 
 
-class GeneratorNames(enum.Enum):
-    """ Representation of the different terrain generators in Minecraft. """
-    DEFAULT = "default"
-    FLAT = "flat"
-    LARGEBIOMES = "largebiomes"
-    AMPLIFIED = "amplified"
-    BUFFET = "buffet"
-    DEBUG_ALL_BLOCK_STATES = "debug_all_block_states"
-    DEFAULT_1_1 = "default_1_1"
+# Representation of the different terrain generators in Minecraft
+generator_names = ["Default", "Flat", "Largebiomes", "Amplified", "Buffet",
+                   "Debug_all_block_states", "Default_1_1"]
 
+# Distribution of biomes for the Buffet terrain generator
+buffet_types = ["Fixed", "Checkerboard", "Vanilla_layered", "The_end"]
 
-class BuffetOpts:
-    """ Available options for the Buffet terrain generator. """
-
-    class BType(enum.Enum):
-        """ Distribution of biomes for the Buffet terrain generator. """
-        FIXED = "fixed"
-        CHECKERBOARD = "checkerboard"
-        VANILLA_LAYERED = "vanilla_layered"
-        THE_END = "the_end"
-
-    class BChunkGen(enum.Enum):
-        """ Distribution of terrain for the Buffet terrain generator. """
-        SURFACE = "surface"
-        CAVES = "caves"
-        FLOATING_ISLANDS = "floating_islands"
-        SUPERFLAT = "flat"
-        DEBUG = "debug"
+# Distribution of terrain for the Buffet terrain generator.
+buffet_chunk_gen = ["Surface", "Caves", "Floating_islands", "Flat", "Debug"]
 
 
 def get_mc_definitions(resource: str) -> List[str]:
