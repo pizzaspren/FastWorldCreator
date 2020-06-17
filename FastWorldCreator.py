@@ -1,7 +1,6 @@
 import logging
-from enum import Enum
 from functools import partial
-from typing import List, Type, Generator, Union
+from typing import Generator, Union
 
 import PySimpleGUI as sg
 
@@ -26,20 +25,10 @@ sg.SetOptions(
     input_text_color="#000000"
 )
 
-
-def enum_to_cb_contents(cls: Type[Enum]) -> List[str]:
-    """ Extract enum.Enum names into a list, formatted as titles.
-
-    :param cls: The Enum class to extract
-    :return: The extracted names for the members of the enum
-    """
-    return [e.name.title() for e in cls]
-
-
 available_datapacks = cu.get_available_datapacks()
 available_datapacks.sort(key=lambda x: x.name)
-difficulties = enum_to_cb_contents(mu.Difficulties)
-game_modes = enum_to_cb_contents(mu.GameModes)
+difficulties = [d.name.title() for d in mu.Difficulties]
+game_modes = [g.name.title() for g in mu.GameModes]
 biomes = mu.get_mc_definitions("biomes")
 gamerules = get_default_gamerules()
 
