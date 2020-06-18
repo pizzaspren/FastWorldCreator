@@ -4,11 +4,7 @@ import logging
 
 import PySimpleGUI as sg
 
-from fast_world_creator.ui import defaulted_elements as de
 from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu
-
-config = cu.get_or_create_config()
-ui_defaults = cu.get_default_ui_values()
 
 supported_versions = [k for k in mu.version_map]
 installed_versions = [k for k in cu.find_installed_minecraft_versions()]
@@ -73,21 +69,16 @@ class FwcWindow(sg.Window):
                 sg.Frame("Version", [
                     [
                         sg.T('Minecraft Version', size=(15, 1)),
-                        de.DefaultedCombo(ui_defaults, "main_release",
-                                          installed_versions,
-                                          size=(25, 1), readonly=True)
+                        sg.Combo(installed_versions, installed_versions[0],
+                                 (25, 1), readonly=True, key="main_release")
                     ],
                     [
-                        de.DefaultedRadio(ui_defaults,
-                                          "main_installed_versions", True,
-                                          text="Show installed versions",
-                                          group_id="radio_versions",
-                                          enable_events=True),
-                        de.DefaultedRadio(ui_defaults,
-                                          "main_all_versions", False,
-                                          text="Show all versions",
-                                          group_id="radio_versions",
-                                          enable_events=True)
+                        sg.Radio("Show installed versions", "radio_versions",
+                                 True, enable_events=True,
+                                 key="main_installed_versions"),
+                        sg.Radio("Show all versions", "radio_versions",
+                                 False, enable_events=True,
+                                 key="main_all_versions")
                     ]
                 ])
             ]]
@@ -98,18 +89,18 @@ class FwcWindow(sg.Window):
             c1_layout += [[
                 sg.T('Seed', size=(10, 1),
                      tooltip="Leave blank for random seed"),
-                de.DefaultedInput(ui_defaults, "main_seed", "", size=(21, 1),
-                                  tooltip="Leave blank for random seed")
+                sg.I("", (21, 1), tooltip="Leave blank for random seed",
+                     key="main_seed")
             ]]
             c1_layout += [[
                 sg.T('Difficulty', size=(10, 1)),
-                de.DefaultedCombo(ui_defaults, "main_difficulty", difficulties,
-                                  size=(19, 1), readonly=True)
+                sg.Combo(difficulties, difficulties[0], (19, 1), readonly=True,
+                         key="main_difficulty")
             ]]
             c1_layout += [[
                 sg.T('Game mode', size=(10, 1)),
-                de.DefaultedCombo(ui_defaults, "main_game_mode", game_modes,
-                                  size=(19, 1), readonly=True)
+                sg.Combo(game_modes, game_modes[0], (19, 1), readonly=True,
+                         key="main_game_mode")
             ]]
             c2_layout = [[sg.Frame('Weather', create_weather_layout())]]
             layout += [[
@@ -127,12 +118,9 @@ class FwcWindow(sg.Window):
             """
             logging.debug("Creating weather layout")
             layout = [
-                [de.DefaultedRadio(ui_defaults, "main_clear", True,
-                                   text="Clear", group_id="weather")],
-                [de.DefaultedRadio(ui_defaults, "main_rain", False, text="Rain",
-                                   group_id="weather")],
-                [de.DefaultedRadio(ui_defaults, "main_thundering", False,
-                                   text="Thunder", group_id="weather")]
+                [sg.Radio("Clear", "weather", True, key="main_clear")],
+                [sg.Radio("Rain", "weather", False, key="main_rain")],
+                [sg.Radio("Thunder", "weather", False, key="main_thundering")]
             ]
             return layout
 
@@ -173,14 +161,9 @@ class FwcWindow(sg.Window):
                 col1.add_row(sg.Text(gr, (25, 1)))
                 key = f"gamerules_{gr}"
                 if isinstance(gamerules.get(gr), bool):
-                    col2.add_row(
-                        sg.CB("",
-                              ui_defaults.get(key.lower(), gamerules.get(gr)),
-                              key=key))
+                    col2.add_row(sg.CB("", gamerules.get(gr), key=key))
                 else:
-                    col2.add_row(
-                        sg.I(ui_defaults.get(key.lower(), gamerules.get(gr)),
-                             (10, 1), key=key))
+                    col2.add_row(sg.I(gamerules.get(gr), (10, 1), key=key))
                 grouped.add_row(col1, col2)
             return [[grouped]]
 
@@ -194,9 +177,9 @@ class FwcWindow(sg.Window):
             layout = []
             layout += [[
                 sg.T("World type", (16, 1), pad=(10, 10)),
-                de.DefaultedCombo(ui_defaults, "terrain_generator", generators,
-                                  "Default", size=(25, 1), pad=(3, 10),
-                                  readonly=True, enable_events=True)
+                sg.Combo(generators, "Default", (25, 1), pad=(3, 10),
+                         readonly=True, enable_events=True,
+                         key="terrain_generator")
             ]]
             layout += [[sg.Frame('Buffet options', create_buffet_options(),
                                  key='buffet_option_frame')]]
@@ -216,46 +199,41 @@ class FwcWindow(sg.Window):
             logging.debug("Creating buffet layout")
             layout = [[
                 sg.T("Chunk generator", (15, 1)),
-                de.DefaultedCombo(ui_defaults, "buffet_chunk_type",
-                                  mu.buffet_chunk_gen, size=(25, 1),
-                                  readonly=True, enable_events=True)
+                sg.Combo(mu.buffet_chunk_gen, mu.buffet_chunk_gen[0], (25, 1),
+                         readonly=True, enable_events=True,
+                         key="buffet_chunk_type")
             ]]
             layout += [[
                 sg.T("Default block", (15, 1)),
-                de.DefaultedCombo(ui_defaults, "buffet_block",
-                                  mu.get_mc_definitions("blocks"), "stone",
-                                  size=(25, 1))
+                sg.Combo(mu.get_mc_definitions("blocks"), "stone", (25, 1),
+                         key="buffet_block")
             ]]
             layout += [[
                 sg.T("Default fluid", (15, 1)),
-                de.DefaultedRadio(ui_defaults, "buffet_fluid_water", True,
-                                  text="Water", group_id="buffet_fluid"),
-                de.DefaultedRadio(ui_defaults, "buffet_fluid_lava", False,
-                                  text="Lava", group_id="buffet_fluid")
+                sg.Radio("Water", "buffet_fluid", True,
+                         key="buffet_fluid_water"),
+                sg.Radio("Lava", "buffet_fluid", False,
+                         key="buffet_fluid_lava"),
             ]]
             layout += [[sg.Text("┈" * 46)]]
             layout += [[
                 sg.T("Biomes distribution", (15, 1)),
-                de.DefaultedCombo(ui_defaults, "buffet_biome_type",
-                                  mu.buffet_types, size=(25, 1), readonly=True,
-                                  enable_events=True)
+                sg.Combo(mu.buffet_types, mu.buffet_types[0], (25, 1),
+                         readonly=True, enable_events=True,
+                         key="buffet_biome_type")
             ]]
             layout += [[
                 sg.T("Checkerboard size", (15, 1)),
-                de.DefaultedSlider(ui_defaults, "buffet_size", 2,
-                                   range=(-4, 16), orientation='h',
-                                   tooltip="".join([
-                                       "The biome squares will have sides of",
-                                       "2^size chunks.\n -4 = 1 block\n",
-                                       "16 = 65536 chunks"]))
+                sg.Slider((-4, 16), 2, orientation='h', tooltip="".join([
+                    "The biome squares will have sides of 2^size chunks.",
+                    "\n -4 = 1 block\n 16 = 65536 chunks"]), key="buffet_size")
             ]]
             layout += [[
                 sg.T("Biomes", (15, 1)),
                 sg.Col([
-                    [de.DefaultedCB(ui_defaults, f"buffet_biomes_{b}", False,
-                                    text=b)] for b in biomes], size=(175, 125),
-                    pad=(5, 5), scrollable=True, vertical_scroll_only=True,
-                    key="buffet_biomes")
+                    [sg.CB(b, False, key=f"buffet_biomes_{b}")] for b in
+                    biomes], size=(175, 125), pad=(5, 5), scrollable=True,
+                    vertical_scroll_only=True, key="buffet_biomes")
             ]]
             return layout
 
@@ -269,26 +247,22 @@ class FwcWindow(sg.Window):
             layout = []
             layout += [[
                 sg.T("Presets", (15, 1)),
-                de.DefaultedCombo(ui_defaults, "flat_preset",
-                                  list(superflat_dict.keys()),
-                                  superflat_presets[0][0], size=(25, 1),
-                                  readonly=True, enable_events=True)
+                sg.Combo(list(superflat_dict.keys()), superflat_presets[0][0],
+                         (25, 1), readonly=True, enable_events=True,
+                         key="flat_preset")
             ]]
             layout += [[
                 sg.T("Biome", (15, 1)),
-                de.DefaultedCombo(ui_defaults, "flat_biome", biomes,
-                                  superflat_presets[0][2], size=(25, 1),
-                                  readonly=True)
+                sg.Combo(biomes, superflat_presets[0][2], (25, 1),
+                         readonly=True, key="flat_biome")
             ]]
             layout += [[
                 sg.T("Layers", (15, 1)),
-                de.DefaultedInput(ui_defaults, "flat_layers",
-                                  superflat_presets[0][1], size=(27, 1))
+                sg.I(superflat_presets[0][1], (27, 1), key="flat_layers")
             ]]
             layout += [[
                 sg.T("Structure flags", (15, 1)),
-                de.DefaultedInput(ui_defaults, "flat_structures",
-                                  superflat_presets[0][3], size=(27, 1))
+                sg.I(superflat_presets[0][3], (27, 1), key="flat_structures")
             ]]
             return layout
 
@@ -301,54 +275,49 @@ class FwcWindow(sg.Window):
             logging.debug("Creating world border layout")
             layout = [[
                 sg.Frame("Border center", [[
-                    sg.T("X"),
-                    de.DefaultedInput(ui_defaults, "border_x", 0, size=(19, 1)),
-                    sg.T("Z"),
-                    de.DefaultedInput(ui_defaults, "border_z", 0, size=(19, 1)),
+                    sg.T("X"), sg.I("0", (19, 1), key="border_x"),
+                    sg.T("Z"), sg.I("0", (19, 1), key="border_z")
                 ]])
             ]]
             col1_layout = [[
                 sg.Frame("Border size", [
                     [
                         sg.T("Initial size", (8, 1)),
-                        de.DefaultedInput(ui_defaults, "border_size",
-                                          "60000000", size=(10, 1),
-                                          justification="right")
+                        sg.I("60000000", (10, 1), key="border_size",
+                             justification="right")
                     ],
                     [
                         sg.T("Final size", (8, 1)),
-                        de.DefaultedInput(ui_defaults, "border_size_target",
-                                          "60000000", size=(10, 1),
-                                          justification="right")
+                        sg.I("60000000", (10, 1), key="border_size_target",
+                             justification="right")
                     ],
                     [
                         sg.T("Lerp time", (8, 1),
                              tooltip="Seconds until border reaches final size"),
-                        de.DefaultedInput(ui_defaults, "border_lerp_time", "0",
-                                          size=(10, 1), justification="right")
+                        sg.I("0", (10, 1), key="border_lerp_time",
+                             justification="right")
                     ]
                 ])
             ]]
             col2_layout = [[
                 sg.T("Damage", (11, 1), tooltip="Damage per block"),
-                de.DefaultedSpin(ui_defaults, "border_damage",
-                                 [str(x / 10) for x in range(201)], "0.2",
-                                 size=(7, 1))
+                sg.Spin([str(x / 10) for x in range(201)], "0.2", size=(7, 1),
+                        key="border_damage")
             ]]
             col2_layout += [[
                 sg.T("Safe distance", (11, 1), tooltip="Blocks beyond border"),
-                de.DefaultedInput(ui_defaults, "border_safe_blocks", "5",
-                                  size=(8, 1), justification="right")
+                sg.I("5", (8, 1), key="border_safe_blocks",
+                     justification="right")
             ]]
             col2_layout += [[
                 sg.T("Warning time", (11, 1)),
-                de.DefaultedInput(ui_defaults, "border_warn_time", "15",
-                                  size=(8, 1), justification="right")
+                sg.I("15", (8, 1), key="border_warn_time",
+                     justification="right")
             ]]
             col2_layout += [[
                 sg.T("Warning blocks", (11, 1)),
-                de.DefaultedInput(ui_defaults, "border_warn_blocks", "5",
-                                  size=(8, 1), justification="right")
+                sg.I("5", (8, 1), key="border_warn_blocks",
+                     justification="right")
             ]]
             layout += [[
                 sg.Col(col2_layout, pad=(0, 0)),
@@ -375,7 +344,18 @@ class FwcWindow(sg.Window):
 
     def Finalize(self):
         super(FwcWindow, self).Finalize()
+        self["border_damage"].Widget.configure(justify="right")
+        self.update_element_visibility()
 
+    finalize = Finalize
+
+    def set_values_from_dict(self, key_dict: dict):
+        for key in key_dict.keys():
+            if key in self.AllKeysDict:
+                self[key].update(key_dict.get(key))
+        self.update_element_visibility()
+
+    def update_element_visibility(self):
         if self["terrain_generator"].get() != "Buffet":
             self["buffet_option_frame"].hide_row()
         if self["terrain_generator"].get() != "Flat":
@@ -384,7 +364,7 @@ class FwcWindow(sg.Window):
             self["buffet_size"].hide_row()
         if self["main_all_versions"].get():
             self["main_release"].update(values=supported_versions,
-                                        value=ui_defaults.get("main_release"))
-        self["border_damage"].Widget.configure(justify="right")
-
-    finalize = Finalize
+                                        value=self["main_release"].get())
+        else:
+            self["main_release"].update(values=installed_versions,
+                                        value=self["main_release"].get())

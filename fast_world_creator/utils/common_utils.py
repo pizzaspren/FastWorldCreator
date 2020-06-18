@@ -82,7 +82,7 @@ def set_default_ui_values(ui_values: dict,
         if section not in sections:
             continue
 
-        key = k[len(section)+1:]
+        key = k[len(section) + 1:]
         val = ui_values.get(k)
         if key == "name":
             continue

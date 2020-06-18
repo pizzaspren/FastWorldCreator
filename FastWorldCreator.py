@@ -5,10 +5,9 @@ from typing import Generator, Union
 import PySimpleGUI as sg
 
 from fast_world_creator import core
+from fast_world_creator.ui import window
 from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
-
-from fast_world_creator.ui import window
 
 config = cu.get_or_create_config()
 ui_defaults = cu.get_default_ui_values(config.get("UI", "template_file"))
@@ -118,6 +117,7 @@ def create(values: dict) -> Generator[Union[str, int], None, None]:
 window = window.FwcWindow(title='Fast world creator', icon="assets/logo64.ico")
 window.create_layouts(game_modes, difficulties, available_datapacks, gamerules,
                       biomes).finalize()
+window.set_values_from_dict(ui_defaults)
 
 while True:
     event, val_dict = window.read(1000)
