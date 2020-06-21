@@ -142,7 +142,13 @@ class FwcWindow(sg.Window):
                 for d, c in zip(d_pair, [c1_layout, c2_layout]):
                     c.add_row(sg.CB(d.name, d.default_enabled, (15, 1),
                                     tooltip=f"{d.name}\n{d.description}"))
-            return [[c1_layout, c2_layout]]
+            return [
+                [c1_layout, c2_layout],
+                [sg.T("_"*35, (41, 0),
+                      justification="center", pad=(2, 0))],
+                [sg.T("Drop your datapacks in 'assets/datapacks'", (41, 0),
+                      justification="center", pad=(2, 0))]
+            ]
 
         def create_gamerule_layout():
             """Create layout for the gamerules tab.
@@ -333,10 +339,13 @@ class FwcWindow(sg.Window):
         main_layout = [
             [sg.TabGroup([[tab1, tab2, tab3, tab4]])],
             [
-                sg.Button('Ok'), sg.Button('Cancel'),
-                sg.T("", (4, 0)),
-                sg.ProgressBar(100, "horizontal", (20, 23), visible=False,
-                               key="progress_bar")
+                sg.B("Create", button_color=("white", "green")),
+                sg.B("Quit", button_color=("white", "red")),
+                sg.ProgressBar(100, "horizontal", (13, 23),
+                               bar_color=("#FDCB52", "#2C2825"),
+                               key="progress_bar"),
+                sg.B("Save", tooltip="Save values to template"),
+                sg.B("Load", tooltip="Load values from template"),
             ]
         ]
         self.layout(main_layout)
@@ -349,7 +358,9 @@ class FwcWindow(sg.Window):
 
     finalize = Finalize
 
-    def set_values_from_dict(self, key_dict: dict):
+    def set_values_from_dict(self, key_dict: dict = None) -> None:
+        if not key_dict:
+            return
         for key in key_dict.keys():
             if key in self.AllKeysDict:
                 self[key].update(key_dict.get(key))

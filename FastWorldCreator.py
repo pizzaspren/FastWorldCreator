@@ -2,21 +2,23 @@ import logging
 from functools import partial
 from typing import Generator, Union
 
+from fast_world_creator.utils import common_utils as cu
+
+config = cu.get_or_create_config()
+log_format = "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s"
+logging.basicConfig(filename=config.get("LOGGING", "file"), filemode="w",
+                    format=log_format, level=logging.getLevelName(
+                        config.get("LOGGING", "level") or "INFO"))
+logging.info("Initializing")
+
+
 import PySimpleGUI as sg
 
 from fast_world_creator import core
 from fast_world_creator.ui import window
-from fast_world_creator.utils import common_utils as cu, minecraft_utils as mu
+from fast_world_creator.utils import minecraft_utils as mu
 from fast_world_creator.utils.level_dat_utils import get_default_gamerules
 
-config = cu.get_or_create_config()
-ui_defaults = cu.get_default_ui_values(config.get("UI", "template_file"))
-
-log_format = "[%(asctime)s] [%(levelname)s] %(module)s - %(message)s"
-logging.basicConfig(filename=config.get("LOGGING", "file"), format=log_format,
-                    level=logging.getLevelName(config.get("LOGGING", "level") or
-                                               "INFO"))
-logging.info("Initializing")
 
 sg.theme(config.get("UI", "theme"))  # Add a touch of color
 sg.SetOptions(
@@ -30,6 +32,7 @@ difficulties = [d.name.title() for d in mu.Difficulties]
 game_modes = [g.name.title() for g in mu.GameModes]
 biomes = mu.get_mc_definitions("biomes")
 gamerules = get_default_gamerules()
+ui_defaults = cu.get_default_ui_values(config.get("UI", "template_file"))
 
 
 def parse_generator_options(values: dict) -> dict:
@@ -121,20 +124,23 @@ window.set_values_from_dict(ui_defaults)
 
 while True:
     event, val_dict = window.read(1000)
-    if event in (None, 'Cancel'):  # if user closes window or clicks cancel
+    if event in [None, 'Quit']:  # if user closes window or clicks quit
         break
-    elif event == "Ok":
+    elif event == "Create":
         for status in create(val_dict):
             window.read(timeout=20)
             if status == "start":
                 logging.info("Starting execution")
-                window["progress_bar"].update(visible=True)
-                window["progress_bar"].UpdateBar(0)
             elif status == "done":
                 logging.info("Execution finished successfully")
-                window["progress_bar"].update(visible=False)
+                window["progress_bar"].UpdateBar(0)
             else:
                 window["progress_bar"].UpdateBar(status)
+    elif event == "Save":
+        cu.set_default_ui_values(val_dict, config.get("UI", "template_file"))
+    elif event == "Load":
+        values = cu.get_default_ui_values()
+        window.set_values_from_dict(values)
     else:
         window.parse_events(event, val_dict)
 

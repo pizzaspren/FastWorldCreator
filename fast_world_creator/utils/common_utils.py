@@ -4,8 +4,8 @@ from configparser import ConfigParser
 from functools import lru_cache
 from typing import Dict, List, Union
 
-from fast_world_creator.datapacks.external_datapack import ExternalDatapack
-from fast_world_creator.datapacks.random_loot import RandomLootDataPack
+from fast_world_creator.datapacks import external_datapack as ed, \
+    random_loot as rl
 from fast_world_creator.utils import minecraft_utils as mu
 
 MC_FOLDER = f"{os.getenv('APPDATA')}/.minecraft"
@@ -24,20 +24,24 @@ def get_or_create_config() -> ConfigParser:
             "level": "INFO"
         }
         cfg["UI"] = {
-            "theme": "DarkAmber"
+            "theme": "DarkAmber",
+            "template_file": "ui_defaults.ini"
         }
         with open("config.ini", "w") as config_file:
             cfg.write(config_file)
     return cfg
 
 
-def get_default_ui_values(template_file: str = "ui_defaults.ini") -> dict:
+def get_default_ui_values(template_file: str = "ui_defaults.ini") \
+        -> Union[dict, None]:
     """ Read the configuration file for the default UI values.
 
     :return: The default values for the UI elements.
     """
     cfg = ConfigParser()
-    cfg.read(template_file)
+    read_files = cfg.read(template_file)
+    if not read_files:
+        return None
     cfg_dict = {}
     for section in cfg.sections():
         prefix = f"{section.lower()}_"
@@ -68,8 +72,10 @@ def get_default_ui_values(template_file: str = "ui_defaults.ini") -> dict:
     return cfg_dict
 
 
-def set_default_ui_values(ui_values: dict,
-                          template_file: str = "ui_defaults.ini") -> None:
+def set_default_ui_values(ui_values: dict, template_file: str = None) -> None:
+    if not template_file:
+        template_file = "ui_defaults.ini"
+    logging.info(f"Storing default values to {template_file}")
     cfg = ConfigParser()
     sections = ["MAIN", "GAMERULES", "TERRAIN", "BUFFET", "BUFFET_BIOMES",
                 "FLAT", "BORDER"]
@@ -151,7 +157,7 @@ def change_directory(to_dir: str) -> str:
 
 
 def get_available_datapacks() -> List[
-    Union[RandomLootDataPack, ExternalDatapack]]:
+        Union[rl.RandomLootDataPack, ed.ExternalDatapack]]:
     """ Get a list of the datapacks that can be added to a world.
 
     Reads the zip files available in the assets/datapacks folder and
@@ -161,11 +167,11 @@ def get_available_datapacks() -> List[
 
     :return: A list of the available datapacks.
     """
-    datapacks = [RandomLootDataPack()]
+    datapacks = [rl.RandomLootDataPack()]
     external_datapack_folder = f"{os.getcwd()}/assets/datapacks"
     for z in os.listdir(external_datapack_folder):
         if z.endswith(".zip"):
-            dp = ExternalDatapack(f"{external_datapack_folder}/{z}")
+            dp = ed.ExternalDatapack(f"{external_datapack_folder}/{z}")
             datapacks.append(dp)
     logging.info(f"Found {len(datapacks)} available datapacks")
     return datapacks
